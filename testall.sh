@@ -1,18 +1,12 @@
 #!/bin/sh
 
-# Regression testing script for MicroC
+# Regression testing script for MicroC modified for use with Democritus
 # Step through a list of files
 #  Compile, run, and check the output of each expected-to-work test
 #  Compile and check the error of each expected-to-fail test
 
-# Path to the LLVM interpreter
+MICROC="./neo.native"
 LLI="lli"
-#LLI="/usr/local/opt/llvm/bin/lli"
-
-# Path to the microc compiler.  Usually "./microc.native"
-# Try "_build/microc.native" if ocamlbuild was unable to create a symbolic link.
-MICROC="./microc.native"
-#MICROC="_build/microc.native"
 
 # Set time limit for all operations
 ulimit -t 30
@@ -24,8 +18,13 @@ globalerror=0
 
 keep=0
 
+if [ ! -f $MICROC ]; then
+    echo "binary .native file is not present. Exiting."
+    exit 1
+fi
+
 Usage() {
-    echo "Usage: testall.sh [options] [.mc files]"
+    echo "Usage: testall.sh [options] [.neo files]"
     echo "-k    Keep intermediate files"
     echo "-h    Print this help"
     exit 1
@@ -74,8 +73,8 @@ RunFail() {
 Check() {
     error=0
     basename=`echo $1 | sed 's/.*\\///
-                             s/.mc//'`
-    reffile=`echo $1 | sed 's/.mc$//'`
+                             s/.neo//'`
+    reffile=`echo $1 | sed 's/.neo$//'`
     basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
 
     echo -n "$basename..."
@@ -107,8 +106,8 @@ Check() {
 CheckFail() {
     error=0
     basename=`echo $1 | sed 's/.*\\///
-                             s/.mc//'`
-    reffile=`echo $1 | sed 's/.mc$//'`
+                             s/.neo//'`
+    reffile=`echo $1 | sed 's/.neo$//'`
     basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
 
     echo -n "$basename..."
@@ -149,20 +148,11 @@ done
 
 shift `expr $OPTIND - 1`
 
-LLIFail() {
-  echo "Could not find the LLVM interpreter \"$LLI\"."
-  echo "Check your LLVM installation and/or modify the LLI variable in testall.sh"
-  exit 1
-}
-
-which "$LLI" >> $globallog || LLIFail
-
-
 if [ $# -ge 1 ]
 then
     files=$@
 else
-    files="tests/test-*.mc tests/fail-*.mc"
+    files="tests/test-*.neo tests/fail-*.neo"
 fi
 
 for file in $files

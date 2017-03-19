@@ -1,0 +1,12 @@
+
+###### Testing test-hello_world
+./neo.native < tests/test-hello_world.neo > test-hello_world.ll
+Fatal error: exception Failure("illegal character \"")
+###### FAILED
+
+###### Testing fail-*
+./neo.native < tests/fail-*.neo 2> fail-*.err >> testall.log
+./testall.sh: line 66: tests/fail-*.neo: No such file or directory
+diff -b fail-*.err tests/fail-*.err > fail-*.diff
+FAILED fail-*.err differs from tests/fail-*.err
+###### FAILED
