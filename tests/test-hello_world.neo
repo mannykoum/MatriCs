@@ -1,7 +1,5 @@
-int main() { 
+void hello(){ 
 	int x;
 	x = 4;
 	print(x);
-
-	return 0;
 }

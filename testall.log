@@ -1,9 +1,8 @@
 
 ###### Testing test-hello_world
 ./neo.native < tests/test-hello_world.neo > test-hello_world.ll
-lli test-hello_world.ll > test-hello_world.out
-diff -b test-hello_world.out tests/test-hello_world.out > test-hello_world.diff
-###### SUCCESS
+Fatal error: exception Failure("unrecognized function main")
+###### FAILED
 
 ###### Testing fail-assign1
 ./neo.native < tests/fail-assign1.neo 2> fail-assign1.err >> testall.log

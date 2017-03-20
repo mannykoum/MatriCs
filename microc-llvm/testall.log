@@ -1,206 +1,206 @@
-/usr/bin/lli
+/usr/local/opt/llvm/bin/lli
 
 ###### Testing test-add1
 ./microc.native < tests/test-add1.mc > test-add1.ll
-lli test-add1.ll > test-add1.out
+/usr/local/opt/llvm/bin/lli test-add1.ll > test-add1.out
 diff -b test-add1.out tests/test-add1.out > test-add1.diff
 ###### SUCCESS
 
 ###### Testing test-arith1
 ./microc.native < tests/test-arith1.mc > test-arith1.ll
-lli test-arith1.ll > test-arith1.out
+/usr/local/opt/llvm/bin/lli test-arith1.ll > test-arith1.out
 diff -b test-arith1.out tests/test-arith1.out > test-arith1.diff
 ###### SUCCESS
 
 ###### Testing test-arith2
 ./microc.native < tests/test-arith2.mc > test-arith2.ll
-lli test-arith2.ll > test-arith2.out
+/usr/local/opt/llvm/bin/lli test-arith2.ll > test-arith2.out
 diff -b test-arith2.out tests/test-arith2.out > test-arith2.diff
 ###### SUCCESS
 
 ###### Testing test-arith3
 ./microc.native < tests/test-arith3.mc > test-arith3.ll
-lli test-arith3.ll > test-arith3.out
+/usr/local/opt/llvm/bin/lli test-arith3.ll > test-arith3.out
 diff -b test-arith3.out tests/test-arith3.out > test-arith3.diff
 ###### SUCCESS
 
 ###### Testing test-fib
 ./microc.native < tests/test-fib.mc > test-fib.ll
-lli test-fib.ll > test-fib.out
+/usr/local/opt/llvm/bin/lli test-fib.ll > test-fib.out
 diff -b test-fib.out tests/test-fib.out > test-fib.diff
 ###### SUCCESS
 
 ###### Testing test-for1
 ./microc.native < tests/test-for1.mc > test-for1.ll
-lli test-for1.ll > test-for1.out
+/usr/local/opt/llvm/bin/lli test-for1.ll > test-for1.out
 diff -b test-for1.out tests/test-for1.out > test-for1.diff
 ###### SUCCESS
 
 ###### Testing test-for2
 ./microc.native < tests/test-for2.mc > test-for2.ll
-lli test-for2.ll > test-for2.out
+/usr/local/opt/llvm/bin/lli test-for2.ll > test-for2.out
 diff -b test-for2.out tests/test-for2.out > test-for2.diff
 ###### SUCCESS
 
 ###### Testing test-func1
 ./microc.native < tests/test-func1.mc > test-func1.ll
-lli test-func1.ll > test-func1.out
+/usr/local/opt/llvm/bin/lli test-func1.ll > test-func1.out
 diff -b test-func1.out tests/test-func1.out > test-func1.diff
 ###### SUCCESS
 
 ###### Testing test-func2
 ./microc.native < tests/test-func2.mc > test-func2.ll
-lli test-func2.ll > test-func2.out
+/usr/local/opt/llvm/bin/lli test-func2.ll > test-func2.out
 diff -b test-func2.out tests/test-func2.out > test-func2.diff
 ###### SUCCESS
 
 ###### Testing test-func3
 ./microc.native < tests/test-func3.mc > test-func3.ll
-lli test-func3.ll > test-func3.out
+/usr/local/opt/llvm/bin/lli test-func3.ll > test-func3.out
 diff -b test-func3.out tests/test-func3.out > test-func3.diff
 ###### SUCCESS
 
 ###### Testing test-func4
 ./microc.native < tests/test-func4.mc > test-func4.ll
-lli test-func4.ll > test-func4.out
+/usr/local/opt/llvm/bin/lli test-func4.ll > test-func4.out
 diff -b test-func4.out tests/test-func4.out > test-func4.diff
 ###### SUCCESS
 
 ###### Testing test-func5
 ./microc.native < tests/test-func5.mc > test-func5.ll
-lli test-func5.ll > test-func5.out
+/usr/local/opt/llvm/bin/lli test-func5.ll > test-func5.out
 diff -b test-func5.out tests/test-func5.out > test-func5.diff
 ###### SUCCESS
 
 ###### Testing test-func6
 ./microc.native < tests/test-func6.mc > test-func6.ll
-lli test-func6.ll > test-func6.out
+/usr/local/opt/llvm/bin/lli test-func6.ll > test-func6.out
 diff -b test-func6.out tests/test-func6.out > test-func6.diff
 ###### SUCCESS
 
 ###### Testing test-func7
 ./microc.native < tests/test-func7.mc > test-func7.ll
-lli test-func7.ll > test-func7.out
+/usr/local/opt/llvm/bin/lli test-func7.ll > test-func7.out
 diff -b test-func7.out tests/test-func7.out > test-func7.diff
 ###### SUCCESS
 
 ###### Testing test-func8
 ./microc.native < tests/test-func8.mc > test-func8.ll
-lli test-func8.ll > test-func8.out
+/usr/local/opt/llvm/bin/lli test-func8.ll > test-func8.out
 diff -b test-func8.out tests/test-func8.out > test-func8.diff
 ###### SUCCESS
 
 ###### Testing test-gcd
 ./microc.native < tests/test-gcd.mc > test-gcd.ll
-lli test-gcd.ll > test-gcd.out
+/usr/local/opt/llvm/bin/lli test-gcd.ll > test-gcd.out
 diff -b test-gcd.out tests/test-gcd.out > test-gcd.diff
 ###### SUCCESS
 
 ###### Testing test-gcd2
 ./microc.native < tests/test-gcd2.mc > test-gcd2.ll
-lli test-gcd2.ll > test-gcd2.out
+/usr/local/opt/llvm/bin/lli test-gcd2.ll > test-gcd2.out
 diff -b test-gcd2.out tests/test-gcd2.out > test-gcd2.diff
 ###### SUCCESS
 
 ###### Testing test-global1
 ./microc.native < tests/test-global1.mc > test-global1.ll
-lli test-global1.ll > test-global1.out
+/usr/local/opt/llvm/bin/lli test-global1.ll > test-global1.out
 diff -b test-global1.out tests/test-global1.out > test-global1.diff
 ###### SUCCESS
 
 ###### Testing test-global2
 ./microc.native < tests/test-global2.mc > test-global2.ll
-lli test-global2.ll > test-global2.out
+/usr/local/opt/llvm/bin/lli test-global2.ll > test-global2.out
 diff -b test-global2.out tests/test-global2.out > test-global2.diff
 ###### SUCCESS
 
 ###### Testing test-global3
 ./microc.native < tests/test-global3.mc > test-global3.ll
-lli test-global3.ll > test-global3.out
+/usr/local/opt/llvm/bin/lli test-global3.ll > test-global3.out
 diff -b test-global3.out tests/test-global3.out > test-global3.diff
 ###### SUCCESS
 
 ###### Testing test-hello
 ./microc.native < tests/test-hello.mc > test-hello.ll
-lli test-hello.ll > test-hello.out
+/usr/local/opt/llvm/bin/lli test-hello.ll > test-hello.out
 diff -b test-hello.out tests/test-hello.out > test-hello.diff
 ###### SUCCESS
 
 ###### Testing test-if1
 ./microc.native < tests/test-if1.mc > test-if1.ll
-lli test-if1.ll > test-if1.out
+/usr/local/opt/llvm/bin/lli test-if1.ll > test-if1.out
 diff -b test-if1.out tests/test-if1.out > test-if1.diff
 ###### SUCCESS
 
 ###### Testing test-if2
 ./microc.native < tests/test-if2.mc > test-if2.ll
-lli test-if2.ll > test-if2.out
+/usr/local/opt/llvm/bin/lli test-if2.ll > test-if2.out
 diff -b test-if2.out tests/test-if2.out > test-if2.diff
 ###### SUCCESS
 
 ###### Testing test-if3
 ./microc.native < tests/test-if3.mc > test-if3.ll
-lli test-if3.ll > test-if3.out
+/usr/local/opt/llvm/bin/lli test-if3.ll > test-if3.out
 diff -b test-if3.out tests/test-if3.out > test-if3.diff
 ###### SUCCESS
 
 ###### Testing test-if4
 ./microc.native < tests/test-if4.mc > test-if4.ll
-lli test-if4.ll > test-if4.out
+/usr/local/opt/llvm/bin/lli test-if4.ll > test-if4.out
 diff -b test-if4.out tests/test-if4.out > test-if4.diff
 ###### SUCCESS
 
 ###### Testing test-if5
 ./microc.native < tests/test-if5.mc > test-if5.ll
-lli test-if5.ll > test-if5.out
+/usr/local/opt/llvm/bin/lli test-if5.ll > test-if5.out
 diff -b test-if5.out tests/test-if5.out > test-if5.diff
 ###### SUCCESS
 
 ###### Testing test-local1
 ./microc.native < tests/test-local1.mc > test-local1.ll
-lli test-local1.ll > test-local1.out
+/usr/local/opt/llvm/bin/lli test-local1.ll > test-local1.out
 diff -b test-local1.out tests/test-local1.out > test-local1.diff
 ###### SUCCESS
 
 ###### Testing test-local2
 ./microc.native < tests/test-local2.mc > test-local2.ll
-lli test-local2.ll > test-local2.out
+/usr/local/opt/llvm/bin/lli test-local2.ll > test-local2.out
 diff -b test-local2.out tests/test-local2.out > test-local2.diff
 ###### SUCCESS
 
 ###### Testing test-ops1
 ./microc.native < tests/test-ops1.mc > test-ops1.ll
-lli test-ops1.ll > test-ops1.out
+/usr/local/opt/llvm/bin/lli test-ops1.ll > test-ops1.out
 diff -b test-ops1.out tests/test-ops1.out > test-ops1.diff
 ###### SUCCESS
 
 ###### Testing test-ops2
 ./microc.native < tests/test-ops2.mc > test-ops2.ll
-lli test-ops2.ll > test-ops2.out
+/usr/local/opt/llvm/bin/lli test-ops2.ll > test-ops2.out
 diff -b test-ops2.out tests/test-ops2.out > test-ops2.diff
 ###### SUCCESS
 
 ###### Testing test-var1
 ./microc.native < tests/test-var1.mc > test-var1.ll
-lli test-var1.ll > test-var1.out
+/usr/local/opt/llvm/bin/lli test-var1.ll > test-var1.out
 diff -b test-var1.out tests/test-var1.out > test-var1.diff
 ###### SUCCESS
 
 ###### Testing test-var2
 ./microc.native < tests/test-var2.mc > test-var2.ll
-lli test-var2.ll > test-var2.out
+/usr/local/opt/llvm/bin/lli test-var2.ll > test-var2.out
 diff -b test-var2.out tests/test-var2.out > test-var2.diff
 ###### SUCCESS
 
 ###### Testing test-while1
 ./microc.native < tests/test-while1.mc > test-while1.ll
-lli test-while1.ll > test-while1.out
+/usr/local/opt/llvm/bin/lli test-while1.ll > test-while1.out
 diff -b test-while1.out tests/test-while1.out > test-while1.diff
 ###### SUCCESS
 
 ###### Testing test-while2
 ./microc.native < tests/test-while2.mc > test-while2.ll
-lli test-while2.ll > test-while2.out
+/usr/local/opt/llvm/bin/lli test-while2.ll > test-while2.out
 diff -b test-while2.out tests/test-while2.out > test-while2.diff
 ###### SUCCESS
 
