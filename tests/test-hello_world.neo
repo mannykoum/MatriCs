@@ -1,5 +1,11 @@
-void hello(){ 
-	int x;
-	x = 4;
-	print(x);
+int main (){ 
+
+	int hello;
+
+	hello = 5;
+	
+	print(hello);
+
+	return 0;
+
 }
