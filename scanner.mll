@@ -32,7 +32,7 @@ rule token = parse
 | "return" { RETURN }
 | "int"    { INT }
 | "bool"   { BOOL }
-| "String" { STRING }
+| "string" { STRTYPE }
 | "void"   { VOID }
 | "true"   { TRUE }
 | "false"  { FALSE }
