@@ -92,8 +92,8 @@ Check() {
     # Report the status and clean up the generated files
 
     if [ $error -eq 0 ] ; then
-	if [ $keep -eq 0 ] ; then
-	    rm -f $generatedfiles
+    if [ $keep -eq 1 ] ; then
+    rm -f $generatedfiles
 	fi
 	echo "OK"
 	echo "###### SUCCESS" 1>&2

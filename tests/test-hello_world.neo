@@ -1,10 +1,10 @@
 int main (){ 
 
-	int hello;
+	string x;
 
-	hello = 5;
-	
-	print(hello);
+	x = "5\n";
+
+	print(x);
 
 	return 0;
 
