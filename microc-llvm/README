@@ -12,6 +12,16 @@ and opam, then use opam to install llvm.
 The version of the OCaml llvm library should match the version of the LLVM
 system installed on your system.
 
+In addition to print, which calls the C library function printf(),
+this gratuitiously includes a primitive function "printbig," which
+prints large ASCII-encoded characters.
+
+The stock C compiler compiles printbig.o.  testall.sh runs the microc
+executable on each testcase (.mc file) to produce a .ll file, invokes
+"llc" (the LLVM compiler) to produce a .s (assembly) file, then
+invokes "cc" (the stock C compiler) to assemble the .s file, link in
+printbig.o, and generate an executable.  See testall.sh for details.
+
 ------------------------------
 Installation under Ubuntu 15.10
 
@@ -172,7 +182,7 @@ To run and test:
 $ make
 ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis -cflags -w,+a-4 microc.native
 Finished, 22 targets (0 cached) in 00:00:01.
-
+cc    -c -o printbig.o printbig.c
 $ ./testall.sh
 test-arith1...OK
 test-arith2...OK
