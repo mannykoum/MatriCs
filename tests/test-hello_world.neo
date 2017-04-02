@@ -1,11 +1,9 @@
 int main (){ 
 
 	string x;
-
 	x = "hi";
 
 	print(x);
-
 	return 0;
 
 }
