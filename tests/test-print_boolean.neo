@@ -1,0 +1,9 @@
+int main (){ 
+
+	bool x;
+
+	x = true;
+
+	printb(x);
+
+	return 0;
