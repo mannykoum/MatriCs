@@ -5,6 +5,17 @@ lli test-hello_world.ll > test-hello_world.out
 diff -b test-hello_world.out tests/test-hello_world.out > test-hello_world.diff
 ###### SUCCESS
 
+###### Testing test-print_boolean
+./neo.native < tests/test-print_boolean.neo > test-print_boolean.ll
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test-print_int
+./neo.native < tests/test-print_int.neo > test-print_int.ll
+lli test-print_int.ll > test-print_int.out
+diff -b test-print_int.out tests/test-print_int.out > test-print_int.diff
+###### SUCCESS
+
 ###### Testing fail-assign1
 ./neo.native < tests/fail-assign1.neo 2> fail-assign1.err >> testall.log
 diff -b fail-assign1.err tests/fail-assign1.err > fail-assign1.diff

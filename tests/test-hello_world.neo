@@ -2,7 +2,7 @@ int main (){
 
 	string x;
 
-	x = "hi";
+	x = "hello\n";
 
 	print(x);
 
