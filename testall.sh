@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Regression testing script for MicroC modified for use with Democritus
+# Regression testing script for MicroC modified for use with MatriCs
 # Step through a list of files
 #  Compile, run, and check the output of each expected-to-work test
 #  Compile and check the error of each expected-to-fail test
@@ -92,8 +92,8 @@ Check() {
     # Report the status and clean up the generated files
 
     if [ $error -eq 0 ] ; then
-    if [ $keep -eq 1 ] ; then
-    rm -f $generatedfiles
+    	if [ $keep -eq 0 ] ; then
+    		rm -f $generatedfiles
 	fi
 	echo "OK"
 	echo "###### SUCCESS" 1>&2

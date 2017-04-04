@@ -1,4 +1,16 @@
 
+###### Testing test-comments
+./neo.native < tests/test-comments.neo > test-comments.ll
+lli test-comments.ll > test-comments.out
+diff -b test-comments.out tests/test-comments.out > test-comments.diff
+###### SUCCESS
+
+###### Testing test-empty
+./neo.native < tests/test-empty.neo > test-empty.ll
+lli test-empty.ll > test-empty.out
+diff -b test-empty.out tests/test-empty.out > test-empty.diff
+###### SUCCESS
+
 ###### Testing test-hello_world
 ./neo.native < tests/test-hello_world.neo > test-hello_world.ll
 lli test-hello_world.ll > test-hello_world.out
