@@ -54,8 +54,9 @@ and comment = parse
 | _    { comment lexbuf }
 
 and comment2 = parse
-| '\n' { token lexbuf }
-| _        { comment2 lexbuf }
+  '\n' { token lexbuf }
+| _    { comment2 lexbuf }
+
 and read_string buf =
   parse
   | '"'       { STRING (Buffer.contents buf) }

@@ -5,7 +5,6 @@ int main (){
 	x = "hello\n";
 
 	print(x);
-
 	return 0;
 
 }
