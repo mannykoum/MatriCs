@@ -4,10 +4,10 @@
 open Ast
 %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA
+%token SEMI LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA
 %token PLUS MINUS TIMES DIVIDE ASSIGN NOT
 %token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
-%token RETURN IF ELSE FOR WHILE INT BOOL STRTYPE VOID
+%token RETURN IF ELSE FOR WHILE INT BOOL STRTYPE VOID VECTOR
 %token <string> STRING
 %token <int> LITERAL
 %token <string> ID
@@ -58,6 +58,7 @@ typ:
   | BOOL 	{ Bool }
   | STRTYPE 	{ MyString }
   | VOID 	{ Void }
+  | VECTOR typ LBRACKET LITERAL RBRACKET {Vector($2, $4) }
 
 vdecl_list:
     /* nothing */    { [] }
@@ -108,6 +109,13 @@ expr:
   | ID ASSIGN expr   { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN { $2 }
+  | LBRACE vect_lit RBRACE { Vector_lit($2)}
+  | ID LBRACKET expr RBRACKET { Vector_access($1, $3) }
+
+vect_lit:
+    /* nothing */ { [] }
+  | expr 
+  | vect_list COMMA expr  
 
 actuals_opt:
     /* nothing */ { [] }
