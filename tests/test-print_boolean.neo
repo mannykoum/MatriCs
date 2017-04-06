@@ -7,3 +7,4 @@ int main (){
 	printb(x);
 
 	return 0;
+}
