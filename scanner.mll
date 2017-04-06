@@ -10,6 +10,8 @@ rule token = parse
 | ')'      { RPAREN }
 | '{'      { LBRACE }
 | '}'      { RBRACE }
+| '['      { LBRACKET }
+| ']'      { RBRACKET }
 | ';'      { SEMI }
 | ','      { COMMA }
 | '+'      { PLUS }
@@ -31,12 +33,16 @@ rule token = parse
 | "for"    { FOR }
 | "while"  { WHILE }
 | "return" { RETURN }
+
 | "int"    { INT }
 | "bool"   { BOOL }
 | "string" { STRTYPE }
 | "void"   { VOID }
+| "vector" { VECTOR }
+
 | "true"   { TRUE }
 | "false"  { FALSE }
+
 | ['0'-'9']+ as lxm { LITERAL(int_of_string lxm) }
 | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { ID(lxm) }
 | '"' { read_string (Buffer.create 17) lexbuf } 
