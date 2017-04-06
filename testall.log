@@ -21,14 +21,18 @@ diff -b test-hello_world.out tests/test-hello_world.out > test-hello_world.diff
 ./neo.native < tests/test-print_boolean.neo > test-print_boolean.ll
 lli test-print_boolean.ll > test-print_boolean.out
 diff -b test-print_boolean.out tests/test-print_boolean.out > test-print_boolean.diff
-FAILED test-print_boolean.out differs from tests/test-print_boolean.out
-###### FAILED
+###### SUCCESS
 
 ###### Testing test-print_int
 ./neo.native < tests/test-print_int.neo > test-print_int.ll
 lli test-print_int.ll > test-print_int.out
 diff -b test-print_int.out tests/test-print_int.out > test-print_int.diff
 ###### SUCCESS
+
+###### Testing test-semant
+./neo.native < tests/test-semant.neo > test-semant.ll
+Fatal error: exception Failure("illegal void local x in main")
+###### FAILED
 
 ###### Testing fail-assign1
 ./neo.native < tests/fail-assign1.neo 2> fail-assign1.err >> testall.log
