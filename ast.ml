@@ -5,7 +5,10 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
 
 type uop = Neg | Not
 
-type typ = Int | Bool | MyString | Void
+(* HERE ADD NUM TYPE FOR FLOATS AND INTS*)
+
+type typ = Int | Bool | MyString | Void 
+	  | Vector of typ * int
 
 type bind = typ * string
 
@@ -13,11 +16,13 @@ type expr =
     Literal of int
   | BoolLit of bool
   | MyStringLit of string
+  | Vector_lit of typ list
   | Id of string
   | Binop of expr * op * expr
   | Unop of uop * expr
   | Assign of string * expr
   | Call of string * expr list
+  | Vector_access of string * expr
   | Noexpr
 
 type stmt =
@@ -90,6 +95,7 @@ let string_of_typ = function
   | Bool -> "bool"
   | MyString -> "string" 
   | Void -> "void"
+  | Vector -> "vector"
 
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
