@@ -16,7 +16,7 @@ type expr =
     Literal of int
   | BoolLit of bool
   | MyStringLit of string
-  | Vector_lit of typ list
+  | Vector_lit of expr list
   | Id of string
   | Binop of expr * op * expr
   | Unop of uop * expr
@@ -95,7 +95,7 @@ let string_of_typ = function
   | Bool -> "bool"
   | MyString -> "string" 
   | Void -> "void"
-  | Vector -> "vector"
+  | Vector(t, l) -> "vector "^(*(string_of_typ t)^*)"["^(string_of_int l)^"]"
 
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"

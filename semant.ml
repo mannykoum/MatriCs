@@ -88,6 +88,7 @@ if List.mem "print" (List.map (fun fd -> fd.fname) functions)
 
   let _ = function_decl "main" in (* Ensure "main" is defined *)
 
+  (* -- Top-level function -- *)
   let check_function func =
 
     List.iter (check_not_void (fun n -> "illegal void formal " ^ n ^
