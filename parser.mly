@@ -106,16 +106,16 @@ expr:
   | expr OR     expr { Binop($1, Or,    $3) }
   | MINUS expr %prec NEG { Unop(Neg, $2) }
   | NOT expr         { Unop(Not, $2) }
-  | ID ASSIGN expr   { Assign($1, $3) }
+  | expr ASSIGN expr   { Assign($1, $3) } (* changed from ID ASSIGN expr; hope fwd-decl is off *)
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN { $2 }
   | LBRACE vect_lit RBRACE { Vector_lit($2)}
   | ID LBRACKET expr RBRACKET { Vector_access($1, $3) }
 
+(* literals inside braces ie. 1, 2, 3 *)
 vect_lit:
-    /* nothing */ { [] }
-  | expr 
-  | vect_list COMMA expr  
+    expr                    { [$1] }
+  | vect_lit COMMA expr { $3 :: $1 }
 
 actuals_opt:
     /* nothing */ { [] }
