@@ -38,7 +38,8 @@ rule token = parse
 | "bool"   { BOOL }
 | "string" { STRTYPE }
 | "void"   { VOID }
-| "vector" { VECTOR }
+
+(*| "vector" { VECTOR } *)
 
 | "true"   { TRUE }
 | "false"  { FALSE }
