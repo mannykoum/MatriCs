@@ -76,6 +76,7 @@ let rec string_of_expr = function
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> ""
+  (*ADD PATTERN FOR VECTOR_LIT AND VECTOR_ACCESS*)
 
 let rec string_of_stmt = function
     Block(stmts) ->
