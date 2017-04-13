@@ -97,8 +97,15 @@ if List.mem "print" (List.map (fun fd -> fd.fname) functions)
     report_duplicate (fun n -> "duplicate formal " ^ n ^ " in " ^ func.fname)
       (List.map snd func.formals);
 
+
+    (* Function to print all formal arguments 
+    List.iter (fun (t, n) -> print_string ( string_of_typ t ^ " " ^ n)) func.formals;
+    *)
+
     List.iter (check_not_void (fun n -> "illegal void local " ^ n ^
       " in " ^ func.fname)) func.locals;
+
+    List.iter (fun (t, n) -> print_string ( string_of_typ t ^ " " ^ n)) func.locals;
 
     report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ func.fname)
       (List.map snd func.locals);
@@ -114,44 +121,56 @@ if List.mem "print" (List.map (fun fd -> fd.fname) functions)
     in
 
     (* Return the type of an expression or throw an exception *)
-    let rec expr = function
-	Literal _ -> Int
-      | BoolLit _ -> Bool
-      | Id s -> type_of_identifier s
-      | MyStringLit _ -> MyString
-      | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
-	(match op with
+  let rec expr = function
+  	Literal _ -> Int
+        | BoolLit _ -> Bool
+        | Id s -> type_of_identifier s
+        | MyStringLit _ -> MyString
+        | Vector_lit elements -> 
+          let rec check_vector_types = function
+            | [] -> raise( Failure ("empty literal not allowed"))
+            | [el] -> expr el(* expr el TODO: put vector type here *)
+            | fst :: snd :: tail -> 
+              if (expr fst) == (expr snd) then
+                check_vector_types (snd::tail)
+              else raise (Failure ("unmatched element types in vector literal " ^
+                string_of_typ (expr fst) ^ ", " ^ string_of_typ (expr snd))) 
+          in check_vector_types elements 
+        
+        | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
+  	(match op with
           Add | Sub | Mult | Div when t1 = Int && t2 = Int -> Int
-	| Equal | Neq when t1 = t2 -> Bool
-	| Less | Leq | Greater | Geq when t1 = Int && t2 = Int -> Bool
-	| And | Or when t1 = Bool && t2 = Bool -> Bool
+        | Equal | Neq when t1 = t2 -> Bool
+        | Less | Leq | Greater | Geq when t1 = Int && t2 = Int -> Bool
+        | And | Or when t1 = Bool && t2 = Bool -> Bool
         | _ -> raise (Failure ("illegal binary operator " ^
               string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
               string_of_typ t2 ^ " in " ^ string_of_expr e))
-        )
-      | Unop(op, e) as ex -> let t = expr e in
-	 (match op with
-	   Neg when t = Int -> Int
-	 | Not when t = Bool -> Bool
-         | _ -> raise (Failure ("illegal unary operator " ^ string_of_uop op ^
-	  		   string_of_typ t ^ " in " ^ string_of_expr ex)))
-      | Noexpr -> Void
-      | Assign(var, e) as ex -> let lt = type_of_identifier var
-                                and rt = expr e in
-        check_assign lt rt (Failure ("illegal assignment " ^ string_of_typ lt ^
-				     " = " ^ string_of_typ rt ^ " in " ^ 
-				     string_of_expr ex))
-      | Call(fname, actuals) as call -> let fd = function_decl fname in
-         if List.length actuals != List.length fd.formals then
-           raise (Failure ("expecting " ^ string_of_int
-             (List.length fd.formals) ^ " arguments in " ^ string_of_expr call))
-         else
-           List.iter2 (fun (ft, _) e -> let et = expr e in
-              ignore (check_assign ft et
-                (Failure ("illegal actual argument found " ^ string_of_typ et ^
-                " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))))
-             fd.formals actuals;
-           fd.typ
+    )
+        | Unop(op, e) as ex -> let t = expr e in
+  	(match op with
+    	    Neg when t = Int -> Int
+    	  | Not when t = Bool -> Bool
+              | _ -> raise (Failure ("illegal unary operator " ^ string_of_uop op ^
+    	  		    string_of_typ t ^ " in " ^ string_of_expr ex))
+    )
+        | Noexpr -> Void
+        | Assign(var, e) as ex -> let lt = type_of_identifier var
+                                  and rt = expr e in
+          check_assign lt rt (Failure ("illegal assignment " ^ string_of_typ lt ^
+  				     " = " ^ string_of_typ rt ^ " in " ^ 
+  				     string_of_expr ex))
+        | Call(fname, actuals) as call -> let fd = function_decl fname in
+           if List.length actuals != List.length fd.formals then
+             raise (Failure ("expecting " ^ string_of_int
+               (List.length fd.formals) ^ " arguments in " ^ string_of_expr call))
+           else
+             List.iter2 (fun (ft, _) e -> let et = expr e in
+                ignore (check_assign ft et
+                  (Failure ("illegal actual argument found " ^ string_of_typ et ^
+                  " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))))
+               fd.formals actuals;
+             fd.typ
     in
 
     let check_bool_expr e = if expr e != Bool
