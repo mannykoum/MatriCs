@@ -58,7 +58,9 @@ typ:
   | BOOL 	{ Bool }
   | STRTYPE 	{ MyString }
   | VOID 	{ Void }
-  | VECTOR typ LBRACKET LITERAL RBRACKET {Vector($2, $4) }
+  | typ LBRACKET LITERAL RBRACKET {Vector($1, $3) }
+
+
 
 vdecl_list:
     /* nothing */    { [] }
@@ -107,18 +109,21 @@ expr:
   | MINUS expr %prec NEG { Unop(Neg, $2) }
   | NOT expr         { Unop(Not, $2) }
   | ID ASSIGN expr   { Assign($1, $3) }
+
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
-  | LPAREN expr RPAREN { $2 }
-  | LBRACE vect_opt RBRACE { Vector_lit($2)}
-  | ID LBRACKET expr RBRACKET { Vector_access($1, $3) }
+  | LPAREN expr RPAREN           { $2 }
+
+  | ID LBRACKET expr RBRACKET    { Vector_access($1, $3) }
+  | LBRACKET vect_opt RBRACKET   { Vector_lit($2) }
 
 vect_opt:
-  /* nothing */ { [] }
-| vect_lit { List.rev $1 }
+ /* nothing */  {[]} 
+|   vect_lit { List.rev $1 }
 
 vect_lit:
     expr                { [$1] }
   | vect_lit COMMA expr { $3 :: $1 }
+
 
 actuals_opt:
     /* nothing */ { [] }
