@@ -105,7 +105,8 @@ if List.mem "print" (List.map (fun fd -> fd.fname) functions)
     List.iter (check_not_void (fun n -> "illegal void local " ^ n ^
       " in " ^ func.fname)) func.locals;
 
-    List.iter (fun (t, n) -> print_string ( string_of_typ t ^ " " ^ n)) func.locals;
+    (* List.iter (fun (t, n) -> print_string ( string_of_typ t ^ " " ^ n)) func.locals;
+    *)
 
     report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ func.fname)
       (List.map snd func.locals);
