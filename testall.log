@@ -2,39 +2,33 @@
 ###### Testing test-comments
 ./neo.native < tests/test-comments.neo > test-comments.ll
 lli test-comments.ll > test-comments.out
-diff -b test-comments.out tests/test-comments.out > test-comments.diff
-###### SUCCESS
+'main' function not found in module.
+###### FAILED
 
 ###### Testing test-empty
 ./neo.native < tests/test-empty.neo > test-empty.ll
 lli test-empty.ll > test-empty.out
-diff -b test-empty.out tests/test-empty.out > test-empty.diff
-###### SUCCESS
+'main' function not found in module.
+###### FAILED
 
 ###### Testing test-hello_world
 ./neo.native < tests/test-hello_world.neo > test-hello_world.ll
 lli test-hello_world.ll > test-hello_world.out
-diff -b test-hello_world.out tests/test-hello_world.out > test-hello_world.diff
-###### SUCCESS
+'main' function not found in module.
+###### FAILED
 
 ###### Testing test-print_boolean
 ./neo.native < tests/test-print_boolean.neo > test-print_boolean.ll
 lli test-print_boolean.ll > test-print_boolean.out
-diff -b test-print_boolean.out tests/test-print_boolean.out > test-print_boolean.diff
-###### SUCCESS
+'main' function not found in module.
+###### FAILED
 
 ###### Testing test-print_int
 ./neo.native < tests/test-print_int.neo > test-print_int.ll
 lli test-print_int.ll > test-print_int.out
-diff -b test-print_int.out tests/test-print_int.out > test-print_int.diff
-###### SUCCESS
-
-###### Testing test-semant
-./neo.native < tests/test-semant.neo > test-semant.ll
-Fatal error: exception Failure("illegal void local x in main")
+'main' function not found in module.
 ###### FAILED
 
 ###### Testing fail-assign1
 ./neo.native < tests/fail-assign1.neo 2> fail-assign1.err >> testall.log
-diff -b fail-assign1.err tests/fail-assign1.err > fail-assign1.diff
-###### SUCCESS
+###### FAILED
