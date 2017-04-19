@@ -1,7 +1,6 @@
 int main (){ 
 
 	string x;
-
 	x = "hello\n";
 
 	print(x);
