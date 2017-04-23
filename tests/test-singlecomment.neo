@@ -1,0 +1,4 @@
+int main() {
+	// Single line comment
+	return 0;
+}
