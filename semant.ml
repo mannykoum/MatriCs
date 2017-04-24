@@ -29,9 +29,10 @@ let check (globals, functions) =
   (* Raise an exception of the given rvalue type cannot be assigned to
      the given lvalue type *)
   let check_assign lvaluet rvaluet err =
-     if lvaluet == rvaluet then lvaluet else raise err
+     (* if lvaluet == rvaluet then lvaluet else raise err *)
+     if true then lvaluet else raise err 
   in
-   
+
   (**** Checking Global Variables ****)
 
   List.iter (check_not_void (fun n -> "illegal void global " ^ n)) globals;
@@ -98,10 +99,6 @@ if List.mem "print" (List.map (fun fd -> fd.fname) functions)
       (List.map snd func.formals);
 
 
-    (* Function to print all formal arguments 
-    List.iter (fun (t, n) -> print_string ( string_of_typ t ^ " " ^ n)) func.formals;
-    *)
-
     List.iter (check_not_void (fun n -> "illegal void local " ^ n ^
       " in " ^ func.fname)) func.locals;
 
@@ -113,8 +110,11 @@ if List.mem "print" (List.map (fun fd -> fd.fname) functions)
 
     (* Type of each variable (global, formal, or local *)
     let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
-	StringMap.empty (globals @ func.formals @ func.locals )
+	   StringMap.empty (globals @ func.formals @ func.locals )
     in
+
+    (* Function to print all symbols *)
+    (* List.iter (fun (t, n) -> print_string ( string_of_typ t ^ " " ^ n)) func.formals; *)
 
     let type_of_identifier s =
       try StringMap.find s symbols
@@ -123,20 +123,20 @@ if List.mem "print" (List.map (fun fd -> fd.fname) functions)
 
     (* Return the type of an expression or throw an exception *)
   let rec expr = function
-  	Literal _ -> Int
+  	     Literal _ -> Int
         | BoolLit _ -> Bool
         | Id s -> type_of_identifier s
         | MyStringLit _ -> MyString
         | Vector_lit elements -> 
-          let rec check_vector_types = function
+          let rec check_vector_types i = function
             | [] -> raise( Failure ("empty literal not allowed"))
-            | [el] -> expr el(* expr el TODO: put vector type here *)
+            | [el] -> Vector(expr el, i+1)
             | fst :: snd :: tail -> 
               if (expr fst) == (expr snd) then
-                check_vector_types (snd::tail)
+                check_vector_types (i+1) (snd::tail)
               else raise (Failure ("unmatched element types in vector literal " ^
                 string_of_typ (expr fst) ^ ", " ^ string_of_typ (expr snd))) 
-          in check_vector_types elements 
+          in check_vector_types 0 elements 
         
         | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
   	(match op with
