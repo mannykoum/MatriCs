@@ -1,6 +1,7 @@
-(* Semantic checking for the MicroC compiler *)
+(*Semantic checking for MatriCs compiler*)
 
 open Ast
+open Sast
 
 module StringMap = Map.Make(String)
 
@@ -44,7 +45,7 @@ let check (globals, functions) =
   
   if List.mem "int_to_string" (List.map (fun fd -> fd.fname) functions)
   then raise (Failure ("function int_to_string may not be defined")) else ();
-if List.mem "print" (List.map (fun fd -> fd.fname) functions)
+  if List.mem "print" (List.map (fun fd -> fd.fname) functions)
   then raise (Failure ("function print may not be defined")) else ();
 
   report_duplicate (fun n -> "duplicate function " ^ n)
@@ -89,6 +90,7 @@ if List.mem "print" (List.map (fun fd -> fd.fname) functions)
 
   let _ = function_decl "main" in (* Ensure "main" is defined *)
 
+
   (* -- Top-level function -- *)
   let check_function func =
 
@@ -101,9 +103,6 @@ if List.mem "print" (List.map (fun fd -> fd.fname) functions)
 
     List.iter (check_not_void (fun n -> "illegal void local " ^ n ^
       " in " ^ func.fname)) func.locals;
-
-    (* List.iter (fun (t, n) -> print_string ( string_of_typ t ^ " " ^ n)) func.locals;
-    *)
 
     report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ func.fname)
       (List.map snd func.locals);
@@ -180,7 +179,7 @@ if List.mem "print" (List.map (fun fd -> fd.fname) functions)
 
     (* Verify a statement or throw an exception *)
     let rec stmt = function
-	Block sl -> let rec check_block = function
+	   Block sl -> let rec check_block = function
            [Return _ as s] -> stmt s
          | Return _ :: _ -> raise (Failure "nothing may follow a return")
          | Block sl :: ss -> check_block (sl @ ss)
@@ -202,3 +201,68 @@ if List.mem "print" (List.map (fun fd -> fd.fname) functions)
    
   in
   List.iter check_function functions
+
+  and let ASTtoSAST func =
+  	let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
+	   StringMap.empty (globals @ func.formals @ func.locals )
+    in
+
+    (* Function to print all symbols *)
+    (* List.iter (fun (t, n) -> print_string ( string_of_typ t ^ " " ^ n)) func.formals; *)
+
+    let type_of_identifier s =
+      try StringMap.find s symbols
+      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+    
+    in
+
+    let SASTtotyp = function
+    	SLit(_) -> Int
+    	| SBoolLit(_) -> Bool
+    	| SMyStringLit(_) -> MyString
+    	| SBinop(_, _, _, t) 				-> t
+		| SAssign(_, _, t) 					-> t
+		| SCall(_, _, t)					-> t
+		| SUnop(_, _, t) 					-> t
+    	| _ -> raise (Failure ("vector type not supported"))
+    in
+
+    (* Return the type of an expression or throw an exception *)
+  	let rec sexpr = function
+  	     Literal i -> SLit(i)
+        | BoolLit b -> SBoolLit(b)
+        | Id s -> SId(s, type_of_identifier s)
+        | MyStringLit st -> SMyStringLit(st)
+        | Vector_lit elements -> 
+        	let selements = List.map sexpr elements in
+        	SVector_lit(selements, SASTtotyp(sexpr (List.hd elements)))    
+        
+        | Binop(e1, op, e2) as e -> let t1 = sexpr e1 and t2 = sexpr e2 in
+        	SBinop(t1, op, t2, SASTtotyp(t1))
+        | Unop(op, e) as ex -> let t = sexpr e in
+        	SUnop(op, t, SASTtotyp(t))
+        | Noexpr -> SNoexpr 
+
+        | Assign(var, e) as ex -> let lt = sexpr var in
+                                  and rt = sexpr e in
+                                  and ty = type_of_identifier var
+          in
+          SAssign(sexpr var, rt, ty)
+        | Call(fname, actuals) as call -> (* let fd = function_decl fname in *)
+        	let sactuals = List.map sexpr actuals in
+        	SCall(fname, sactuals, SASTtotyp(sexpr (List.hd sactuals)))  
+    	in
+
+    let rec sstmt = function
+    (* 	  SBlock of sstmt list   *)
+    	Return(e)				-> SReturn(sexpr e)
+		| Block(stmt_l) 		-> SBlock(List.map sstmt stmt_l)
+		| Expr(e) 				-> SExpr(sexpr e)
+		| If(e, s1, s2) 		-> SIf((sexpr e), (sstmt s1), (sstmt s2))
+		| For(e1, e2, e3, s) 	-> SFor((sexpr e1), (sexpr e2), (sexpr e3), (sstmt s))
+		| While(e, s)			-> SWhile((sexpr e), (sstmt s))
+    in
+    	sstmt (Block func.body)
+    in
+   	let sast = List.map ASTtoSAST functions
+   	in sast
