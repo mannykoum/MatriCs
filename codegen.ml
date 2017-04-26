@@ -14,9 +14,10 @@ http://llvm.moe/ocaml/
 
 module L = Llvm
 module A = Ast
+module S = Semant 
 
 module StringMap = Map.Make(String)
-
+ 
 let translate (globals, functions) =
   let context = L.global_context () in
   let the_module = L.create_module context "MicroC"
@@ -24,13 +25,21 @@ let translate (globals, functions) =
   (* and i8_t   = L.i8_type   context *) 
   and i1_t   = L.i1_type   context
   and ptr_t  = L.pointer_type (L.i8_type (context)) 
+  and array_t = L.array_type 
   and void_t = L.void_type context in
 
   let ltype_of_typ = function
       A.Int -> i32_t
     | A.Bool -> i1_t
     | A.MyString -> ptr_t
-    | A.Void -> void_t in
+    | A.Void -> void_t 
+    | A.Vector(typ, size) ->
+      (match typ with 
+        A.Int     -> array_t i32_t size
+      | A.Bool  -> array_t i1_t size
+      | A.MyString -> array_t ptr_t size
+      | _ -> raise (Failure("Array Type Not Valid")))
+    in
 
   (* Declare each global variable; remember its value in a map *)
   let global_vars =
@@ -89,6 +98,15 @@ let translate (globals, functions) =
       | A.MyStringLit str -> L.build_global_stringptr str "tmp" builder
       | A.Noexpr -> L.const_int i32_t 0
       | A.Id s -> L.build_load (lookup s) s builder
+      | A.Vector_lit(el) -> 
+        let ty = A.Int in
+        (*)
+        let ty = A.expr (List.hd el)
+        in 
+        (* might need to reverse the list of elements here *) *) 
+        let lst = List.map (expr builder) el in
+        let arr = Array.of_list lst in
+          L.const_array (ltype_of_typ ty) arr
       | A.Binop (e1, op, e2) ->
 	  let e1' = expr builder e1
 	  and e2' = expr builder e2 in
