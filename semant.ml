@@ -200,9 +200,9 @@ let check (globals, functions) =
     stmt (Block func.body)
    
   in
-  List.iter check_function functions
+  List.iter check_function functions 
 
-  and let ASTtoSAST func =
+  let ASTtoSAST func =
   	let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
 	   StringMap.empty (globals @ func.formals @ func.locals )
     in
@@ -244,8 +244,8 @@ let check (globals, functions) =
         | Noexpr -> SNoexpr 
 
         | Assign(var, e) as ex -> let lt = sexpr var in
-                                  and rt = sexpr e in
-                                  and ty = type_of_identifier var
+                                  let rt = sexpr e in
+                                  let ty = type_of_identifier var
           in
           SAssign(sexpr var, rt, ty)
         | Call(fname, actuals) as call -> (* let fd = function_decl fname in *)
@@ -263,6 +263,5 @@ let check (globals, functions) =
 		| While(e, s)			-> SWhile((sexpr e), (sstmt s))
     in
     	sstmt (Block func.body)
-    in
-   	let sast = List.map ASTtoSAST functions
-   	in sast
+    in let sast = List.map ASTtoSAST functions 
+       	  in sast
