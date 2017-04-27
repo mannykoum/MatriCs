@@ -9,7 +9,7 @@ type sexpr =
 	| SId of string * typ
 	| SBinop of sexpr * op * sexpr * typ
 	| SUnop of uop * sexpr * typ
-	| SAssign of sexpr * sexpr * typ
+	| SAssign of string * sexpr * typ
 	| SCall of string * sexpr list * typ
 	| SVector_access of string * sexpr * typ
 	| SNoexpr
