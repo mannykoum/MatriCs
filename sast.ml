@@ -25,7 +25,7 @@ type sstmt =
 
 (* Function Declarations *)
 type sfunc_decl = {
-	sreturn_type 	: typ;
+	styp 			: typ;
 	sfname 			: string;
 	sformals 		: bind list;
 	slocals  		: bind list;
@@ -33,4 +33,4 @@ type sfunc_decl = {
 }
 
 (* All method declarations | Main entry method *)
-type sprogram = bind list * func_decl list
+type sprogram = bind list * sfunc_decl list
