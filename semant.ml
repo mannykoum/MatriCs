@@ -138,22 +138,22 @@ let check (globals, functions) =
           in check_vector_types 0 elements 
         
         | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
-  	(match op with
-          Add | Sub | Mult | Div when t1 = Int && t2 = Int -> Int
-        | Equal | Neq when t1 = t2 -> Bool
-        | Less | Leq | Greater | Geq when t1 = Int && t2 = Int -> Bool
-        | And | Or when t1 = Bool && t2 = Bool -> Bool
-        | _ -> raise (Failure ("illegal binary operator " ^
-              string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
-              string_of_typ t2 ^ " in " ^ string_of_expr e))
-    )
+        	(match op with
+                Add | Sub | Mult | Div when t1 = Int && t2 = Int -> Int
+              | Equal | Neq when t1 = t2 -> Bool
+              | Less | Leq | Greater | Geq when t1 = Int && t2 = Int -> Bool
+              | And | Or when t1 = Bool && t2 = Bool -> Bool
+              | _ -> raise (Failure ("illegal binary operator " ^
+                    string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
+                    string_of_typ t2 ^ " in " ^ string_of_expr e))
+          )
         | Unop(op, e) as ex -> let t = expr e in
-  	(match op with
-    	    Neg when t = Int -> Int
-    	  | Not when t = Bool -> Bool
-              | _ -> raise (Failure ("illegal unary operator " ^ string_of_uop op ^
-    	  		    string_of_typ t ^ " in " ^ string_of_expr ex))
-    )
+        	(match op with
+          	    Neg when t = Int -> Int
+          	  | Not when t = Bool -> Bool
+                    | _ -> raise (Failure ("illegal unary operator " ^ string_of_uop op ^
+          	  		    string_of_typ t ^ " in " ^ string_of_expr ex))
+          )
         | Noexpr -> Void
         | Assign(var, e) as ex -> let lt = type_of_identifier var
                                   and rt = expr e in
@@ -171,6 +171,15 @@ let check (globals, functions) =
                   " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))))
                fd.formals actuals;
              fd.typ
+        | Vector_access(nm, idx) -> let idxtyp = expr idx in 
+          let Vector(typ, sz) = type_of_identifier nm in 
+          if idxtyp != Int then raise (Failure ("array " ^ nm 
+                 ^ " index not an integer"))
+          (* TRY IMPLEMENTING INDEX OUT OF BOUNDS 
+          else let Vector(typ, sz) = type_of_identifier nm in 
+            if (sz - 1) < idx then raise (Failure ("array " ^ nm 
+                 ^ " index out of bounds")) *)
+            else typ
     in
 
     let check_bool_expr e = if expr e != Bool
@@ -202,88 +211,97 @@ let check (globals, functions) =
 
   List.iter check_function functions;
 
-  let ast_to_sast (func, globals) =
+  let ast_to_sast func =
     let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
-         StringMap.empty (globals @ func.formals @ func.locals )
-        in
+      StringMap.empty (globals @ func.formals @ func.locals )
+    in
 
-        (* Function to print all symbols *)
-        (* List.iter (fun (t, n) -> print_string ( string_of_typ t ^ " " ^ n)) func.formals; *)
+    (* Function to print all symbols *)
+    (* List.iter (fun (t, n) -> print_string ( string_of_typ t ^ " " ^ n)) func.formals; *)
 
-        let type_of_identifier s =
-          try StringMap.find s symbols
-          with Not_found -> raise (Failure ("undeclared identifier " ^ s))
-        
-        in
+    let type_of_identifier s =
+      try StringMap.find s symbols
+      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+    in
 
-        let sast_to_typ = function
-          SLit(_) -> Int
-          | SBoolLit(_) -> Bool
-          | SMyStringLit(_) -> MyString
-          | SBinop(_, _, _, t)        -> t
-          | SAssign(_, _, t)          -> t
-          | SCall(_, _, t)          -> t
-          | SUnop(_, _, t)          -> t
-          | _ -> raise (Failure ("vector type not supported"))
-        in
+    let sast_to_typ = function
+      SLit(_) -> Int
+      | SBoolLit(_) -> Bool
+      | SMyStringLit(_) -> MyString
+      | SBinop(_, _, _, t)        -> t
+      | SAssign(_, _, t)          -> t
+      | SCall(_, _, t)          -> t
+      | SUnop(_, _, t)          -> t
+      | _ -> raise (Failure ("vector type not supported"))
+    in
 
-        (* Return the type of an expression or throw an exception *)
-        let rec sexpr = function
-           Literal i -> SLit(i)
-          | BoolLit b -> SBoolLit(b)
-          | Id s -> SId(s, type_of_identifier s)
-          | MyStringLit st -> SMyStringLit(st)
-          | Vector_lit elements -> 
-            let selements = List.map sexpr elements in
-            SVector_lit(selements, sast_to_typ(sexpr (List.hd elements)))    
-          
-          | Binop(e1, op, e2) as e -> let t1 = sexpr e1 and t2 = sexpr e2 in
-            SBinop(t1, op, t2, sast_to_typ(t1))
-          | Unop(op, e) as ex -> let t = sexpr e in
-            SUnop(op, t, sast_to_typ(t))
-          | Noexpr -> SNoexpr 
+    (* Return the type of an expression or throw an exception *)
+    let rec sexpr = function
+       Literal i -> SLit(i)
+      | BoolLit b -> SBoolLit(b)
+      | Id s -> SId(s, type_of_identifier s)
+      | MyStringLit st -> SMyStringLit(st)
+      | Vector_lit elements -> 
+        let selements = List.map sexpr elements in
+        SVector_lit(selements, sast_to_typ(sexpr (List.hd elements)))    
+      
+      | Binop(e1, op, e2) -> let t1 = sexpr e1 and t2 = sexpr e2 in
+        SBinop(t1, op, t2, sast_to_typ(t1))
+      | Unop(op, e) -> let t = sexpr e in
+        SUnop(op, t, sast_to_typ(t))
+      | Noexpr -> SNoexpr 
 
-          | Assign(var, e) as ex -> let lt = var in
-                                    let rt = sexpr e in
-                                    let ty = type_of_identifier var
-              in SAssign(lt, rt, ty)
-          | Call(fname, actuals) as call -> let fd = function_decl fname in
-              let sactuals = List.map sexpr actuals in
-              SCall(fname, sactuals, fd.typ) (* sast_to_typ(sexpr (List.hd sactuals))) *)
-        in
+      | Assign(var, e) -> let lt = var in
+                                let rt = sexpr e in
+                                let ty = type_of_identifier var
+          in SAssign(lt, rt, ty)
+      | Call(fname, actuals) -> let fd = function_decl fname in
+          let sactuals = List.map sexpr actuals in
+          SCall(fname, sactuals, fd.typ) (* sast_to_typ(sexpr (List.hd sactuals))) *)
+      | Vector_access(vname, idx) -> let Vector(typ, _) = type_of_identifier vname in 
+          let sidx = sexpr idx in
+          SVector_access(vname, sidx, typ)
 
-        let rec sstmt = function
-        (*    SBlock of sstmt list   *)
-          Return(e)       -> SReturn(sexpr e)
-        | Block(stmt_l)     -> SBlock(List.map sstmt stmt_l)
-        | Expr(e)         -> SExpr(sexpr e)
-        | If(e, s1, s2)     -> SIf((sexpr e), (sstmt s1), (sstmt s2))
-        | For(e1, e2, e3, s)  -> SFor((sexpr e1), (sexpr e2), (sexpr e3), (sstmt s))
-        | While(e, s)     -> SWhile((sexpr e), (sstmt s))
-        in
-        sstmt (Block func.body);
+    in
 
-        let fdecl_to_func_st globals fdecl =
-          let ffunc_st = List.fold_left 
-            (fun m (t, f) ->  f t m) StringMap.empty fdecl.formals in
-          let lffunc_st = List.fold_left 
-            (fun m (t, l) -> StringMap.add l t m) ffunc_st fdecl.locals in
-          List.fold_left (fun m g -> StringMap.add (snd g) (fst g) m) lffunc_st globals in
+    let rec sstmt = function
+    (*    SBlock of sstmt list   *)
+      Return(e)       -> SReturn(sexpr e)
+    | Block(stmt_l)     -> SBlock(List.map sstmt stmt_l)
+    | Expr(e)         -> SExpr(sexpr e)
+    | If(e, s1, s2)     -> SIf((sexpr e), (sstmt s1), (sstmt s2))
+    | For(e1, e2, e3, s)  -> SFor((sexpr e1), (sexpr e2), (sexpr e3), (sstmt s))
+    | While(e, s)     -> SWhile((sexpr e), (sstmt s))
+    in
+  List.map sstmt func.body;
 
-        let convert_fdecl_to_sfdecl globals fname_map fdecl =
-          {
-            sfname        = fdecl.fname;
-            sreturn_type  = fdecl.return_type;
-            sformals      = fdecl.formals;
-            slocals       = fdecl.locals;
-            sbody         = (sstmt fname_map (fdecl_to_func_st globals fdecl) fdecl.body);
-          }
-        in 
-        
-        let sfdecls = List.map convert_fdecl_to_sfdecl globals func in
+in
+    (*
+    let fdecl_to_func_st globals fdecl =
+      let ffunc_st = List.fold_left 
+        (fun m (t, f) ->  f t m) StringMap.empty fdecl.formals in
+      let lffunc_st = List.fold_left 
+        (fun m (t, l) -> StringMap.add l t m) ffunc_st fdecl.locals in
+      List.fold_left (fun m g -> StringMap.add (snd g) (fst g) m) lffunc_st globals in
+    *)
+  let convert_fdecl_to_sfdecl fdecl =
+    {
+      sfname        = fdecl.fname;
+      styp          = fdecl.typ;
+      sformals      = fdecl.formals;
+      slocals       = fdecl.locals;
+      sbody         = ast_to_sast fdecl;
+    }
+  in 
+    
+  let 
+    sfdecls = List.map convert_fdecl_to_sfdecl functions 
+  in 
+  (globals, sfdecls)
+
+    (*let sfdecls = List.map ast_to_sast functions in
     (globals, sfdecls)
-      in 
-    ast_to_sast
+     *)
     (*let ASTtoSAST func =
         let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
          StringMap.empty (globals @ func.formals @ func.locals )
