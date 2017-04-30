@@ -125,11 +125,16 @@ let translate (globals, functions) =
     	    A.Neg     -> L.build_neg
           | A.Not     -> L.build_not) e' "tmp" builder
       | S.SAssign (s, e, _) -> let e' = expr builder e in
-  	      ignore (L.build_store e' (lookup s) builder); e'
+        (match s with
+          SId(var, _) -> ignore (L.build_store e' (lookup var) builder); e'
+        | SVector_access(vname, index, ty) -> 
+            let ex1 = L.build_gep (lookup vname) [|(L.const_int i32_t 0);(expr builder index)|] vname builder
+          in ignore (L.build_store e' ex1 builder); e'
+  	    | _ -> raise(Failure("should not reach here")))(*should not reach here ignore (L.build_store e' (lookup s) builder); e' *)
       | S.SCall ("print_int", [e], _) | S.SCall ("printb", [e], _) ->
   	     L.build_call printf_func [| int_format_str ; (expr builder e) |]
   	       "printf" builder
-      | S.SCall ("print", [e], _)->
+      | S.SCall ("print", [e], _) ->
           L.build_call printf_func [| (expr builder e) |] "printf" builder
       | S.SCall (f, act, _) ->
         let (fdef, fdecl) = StringMap.find f function_decls in

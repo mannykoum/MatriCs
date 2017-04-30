@@ -30,8 +30,12 @@ let check (globals, functions) =
   (* Raise an exception of the given rvalue type cannot be assigned to
      the given lvalue type *)
   let check_assign lvaluet rvaluet err =
-     (* if lvaluet == rvaluet then lvaluet else raise err *)
-     if true then lvaluet else raise err 
+    (match lvaluet with 
+      Vector(ltyp, lsize) -> 
+        (match rvaluet with
+          Vector(rtyp, rsize) -> if ltyp == rtyp then ltyp else raise err
+          | _ -> if ltyp == rvaluet then ltyp else raise err)
+      | _ -> if lvaluet == rvaluet then lvaluet else raise err)
   in
 
   (**** Checking Global Variables ****)
@@ -155,11 +159,21 @@ let check (globals, functions) =
           	  		    string_of_typ t ^ " in " ^ string_of_expr ex))
           )
         | Noexpr -> Void
-        | Assign(var, e) as ex -> let lt = type_of_identifier var
-                                  and rt = expr e in
-          check_assign lt rt (Failure ("illegal assignment " ^ string_of_typ lt ^
+        | Assign(var_ex, e) as ex -> 
+          (match var_ex with
+            Id var -> let lt = type_of_identifier var
+                      and rt = expr e in
+              check_assign lt rt (Failure ("illegal assignment " ^ string_of_typ lt ^
   				     " = " ^ string_of_typ rt ^ " in " ^ 
   				     string_of_expr ex))
+            | Vector_access(vnm, idx) -> let lt = expr var_ex
+                                        and rt = expr e in
+              check_assign lt rt (Failure ("illegal vector assignment " ^ string_of_typ lt ^
+               " = " ^ string_of_typ rt ^ " in " ^ 
+               string_of_expr ex))
+            | _ -> raise (Failure ("illegal assignment " ^
+            string_of_expr var_ex ^ " = " ^ string_of_expr e ^ 
+            " in " ^ string_of_expr ex)))
         | Call(fname, actuals) as call -> let fd = function_decl fname in
            if List.length actuals != List.length fd.formals then
              raise (Failure ("expecting " ^ string_of_int
@@ -175,7 +189,7 @@ let check (globals, functions) =
           let Vector(typ, sz) = type_of_identifier nm in 
           if idxtyp != Int then raise (Failure ("array " ^ nm 
                  ^ " index not an integer"))
-          (* TRY IMPLEMENTING INDEX OUT OF BOUNDS 
+          (* TODO: TRY IMPLEMENTING INDEX OUT OF BOUNDS 
           else let Vector(typ, sz) = type_of_identifier nm in 
             if (sz - 1) < idx then raise (Failure ("array " ^ nm 
                  ^ " index out of bounds")) *)
@@ -232,6 +246,7 @@ let check (globals, functions) =
       | SAssign(_, _, t)          -> t
       | SCall(_, _, t)          -> t
       | SUnop(_, _, t)          -> t
+      | SVector_access(_, _, t) -> t
       | _ -> raise (Failure ("vector type not supported"))
     in
 
@@ -251,10 +266,28 @@ let check (globals, functions) =
         SUnop(op, t, sast_to_typ(t))
       | Noexpr -> SNoexpr 
 
-      | Assign(var, e) -> let lt = var in
-                                let rt = sexpr e in
-                                let ty = type_of_identifier var
-          in SAssign(lt, rt, ty)
+      | Assign(var_ex, e) as ex-> 
+        (match var_ex with
+          Id var -> let lt = sexpr var_ex
+                    and rt = sexpr e 
+                    and ty = type_of_identifier var in
+                    SAssign(lt, rt, ty)
+          | Vector_access(vnm, idx) -> 
+            let lt = sexpr var_ex
+            and rt = sexpr e 
+            and vty = type_of_identifier vnm in
+            (match vty with
+             Vector(ty, _) -> SAssign(lt, rt, ty)
+            | _ -> raise(Failure("illegal assignment " ^
+            string_of_expr var_ex ^ " = " ^ string_of_expr e ^ 
+            " in " ^ string_of_expr ex)) (* should not reach here after check *) )
+          | _ -> raise(Failure("illegal assignment " ^
+            string_of_expr var_ex ^ " = " ^ string_of_expr e ^ 
+            " in " ^ string_of_expr ex))) (* should not reach here after check *)
+        (* let lt = sexpr var_ex in
+        let rt = sexpr e in
+        let ty = type_of_identifier s
+          in SAssign(lt, rt, ty) *)
       | Call(fname, actuals) -> let fd = function_decl fname in
           let sactuals = List.map sexpr actuals in
           SCall(fname, sactuals, fd.typ) (* sast_to_typ(sexpr (List.hd sactuals))) *)
