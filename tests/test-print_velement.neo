@@ -1,0 +1,10 @@
+int main() {
+	int[5] v;
+	v = [1, 2, 3, 4, 5];
+
+	print_int(v[0]);
+	print_int(v[1]);
+	print_int(v[2]);
+	print_int(v[3]);
+	print_int(v[4]);
+}
