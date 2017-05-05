@@ -7,7 +7,7 @@ type uop = Neg | Not
 
 (* HERE ADD NUM TYPE FOR FLOATS AND INTS*)
 
-type typ = Int | Bool | MyString | Void 
+type typ = Int | Float | Bool | MyString | Void 
 	  | Vector of typ * int
     | Matrix of typ * int * int
 
@@ -15,6 +15,7 @@ type bind = typ * string
 
 type expr =
     Literal of int
+  | Fliteral of float
   | BoolLit of bool
   | MyStringLit of string
   | Vector_lit of expr list
@@ -72,6 +73,7 @@ let string_of_uop = function
 
 let rec string_of_expr = function
     Literal(l) -> string_of_int l
+  | Fliteral(f) -> string_of_float f
   | BoolLit(true) -> "true"
   | BoolLit(false) -> "false"
   | MyStringLit(s) -> s
@@ -104,6 +106,7 @@ let rec string_of_stmt = function
 
 let rec string_of_typ = function
     Int -> "int"
+  | Float -> "float"
   | Bool -> "bool"
   | MyString -> "string" 
   | Void -> "void"

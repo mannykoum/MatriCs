@@ -64,13 +64,15 @@ let check (globals, functions) =
       { typ = Void; fname = "print_int"; formals = [(Int, "x")];
       locals = []; body = [] };
 
-      { typ = Void; fname = "printb"; formals = [(Bool, "x")];
+      { typ = Void; fname = "print_float"; formals = [(Float, "x")];
       locals = []; body = [] };
 
+      { typ = Void; fname = "printb"; formals = [(Bool, "x")];
+      locals = []; body = [] };
       ]
    in 
 
-   let built_in_decls_names = [ "print_int"; "printb" ]
+   let built_in_decls_names = [ "print_int"; "print_float"; "printb" ]
 
  in
 
@@ -104,7 +106,6 @@ let check (globals, functions) =
     report_duplicate (fun n -> "duplicate formal " ^ n ^ " in " ^ func.fname)
       (List.map snd func.formals);
 
-
     List.iter (check_not_void (fun n -> "illegal void local " ^ n ^
       " in " ^ func.fname)) func.locals;
 
@@ -113,7 +114,7 @@ let check (globals, functions) =
 
     (* Type of each variable (global, formal, or local *)
     let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
-	   StringMap.empty (globals @ func.formals @ func.locals )
+	     StringMap.empty (globals @ func.formals @ func.locals )
     in
 
     (* Function to print all symbols *)
@@ -127,6 +128,7 @@ let check (globals, functions) =
     (* Return the type of an expression or throw an exception *)
     let rec expr = function
   	     Literal _ -> Int
+        | Fliteral _ -> Float
         | BoolLit _ -> Bool
         | Id s -> type_of_identifier s
         | MyStringLit _ -> MyString
@@ -239,7 +241,8 @@ let check (globals, functions) =
     in
 
     let sast_to_typ = function
-      SLit(_) -> Int
+      SId(_, t) -> t
+      | SLit(_) -> Int
       | SBoolLit(_) -> Bool
       | SMyStringLit(_) -> MyString
       | SBinop(_, op, _, t)        -> 
@@ -260,6 +263,7 @@ let check (globals, functions) =
     (* Return the type of an expression or throw an exception *)
     let rec sexpr = function
        Literal i -> SLit(i)
+      | Fliteral f -> SFlit(f)
       | BoolLit b -> SBoolLit(b)
       | Id s -> SId(s, type_of_identifier s)
       | MyStringLit st -> SMyStringLit(st)
@@ -268,7 +272,8 @@ let check (globals, functions) =
         SVector_lit(selements, sast_to_typ(sexpr (List.hd elements)))    
       
       | Binop(e1, op, e2) -> let t1 = sexpr e1 and t2 = sexpr e2 in
-        SBinop(t1, op, t2, sast_to_typ(SBinop(t1,op,t2,Int))) (* TODO: Ugly code *)
+        SBinop(t1,op,t2, sast_to_typ(t1)) (* This only checks t1!! Maybe modify later *)
+
       | Unop(op, e) -> let t = sexpr e in
         SUnop(op, t, sast_to_typ(t))
       | Noexpr -> SNoexpr 

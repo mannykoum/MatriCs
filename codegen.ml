@@ -20,8 +20,9 @@ module StringMap = Map.Make(String)
  
 let translate (globals, functions) =
   let context = L.global_context () in
-  let the_module = L.create_module context "MicroC"
+  let the_module = L.create_module context "MatriCs"
   and i32_t  = L.i32_type  context
+  and f64_t  = L.double_type context (* prob with floats *)
   (* and i8_t   = L.i8_type   context *) 
   and i1_t   = L.i1_type   context
   and ptr_t  = L.pointer_type (L.i8_type (context)) 
@@ -30,12 +31,14 @@ let translate (globals, functions) =
 
   let rec ltype_of_typ = function
       A.Int -> i32_t
+    | A.Float -> f64_t 
     | A.Bool -> i1_t
     | A.MyString -> ptr_t
     | A.Void -> void_t 
     | A.Vector(typ, size) ->
       (match typ with 
         A.Int     -> array_t i32_t size
+      | A.Float   -> array_t f64_t size
       | A.Bool  -> array_t i1_t size
       | A.MyString -> array_t ptr_t size
       | A.Vector(typ2, size2) -> array_t (ltype_of_typ (A.Vector(typ2, size2))) size 
@@ -69,6 +72,7 @@ let translate (globals, functions) =
     let builder = L.builder_at_end context (L.entry_block the_function) in
 
     let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
+    let float_format_str = L.build_global_stringptr "%f\n" "fmt" builder in
     
     (* Construct the function's "locals": formal arguments and locally
        declared variables.  Allocate each on the stack, initialize their
@@ -94,7 +98,8 @@ let translate (globals, functions) =
 
     (* Construct code for an expression; return its value *)
     let rec expr builder = function
-	S.SLit i -> L.const_int i32_t i
+	   S.SLit i -> L.const_int i32_t i
+      | S.SFlit f -> L.const_float f64_t f
       | S.SBoolLit b -> L.const_int i1_t (if b then 1 else 0)
       | S.SMyStringLit str -> L.build_global_stringptr str "tmp" builder
       | S.SNoexpr -> L.const_int i32_t 0
@@ -135,6 +140,9 @@ let translate (globals, functions) =
       | S.SCall ("print_int", [e], _) | S.SCall ("printb", [e], _) ->
   	     L.build_call printf_func [| int_format_str ; (expr builder e) |]
   	       "printf" builder
+      | S.SCall ("print_float", [e], _) -> 
+         L.build_call printf_func [| float_format_str ; (expr builder e) |]
+            "printf" builder
       | S.SCall ("print", [e], _) ->
           L.build_call printf_func [| (expr builder e) |] "printf" builder
       | S.SCall (f, act, _) ->

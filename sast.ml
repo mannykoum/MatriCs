@@ -3,6 +3,7 @@ open Ast
 (* Expressions *)
 type sexpr =
 	  SLit of int
+	| SFlit of float
 	| SBoolLit of bool
 	| SMyStringLit of string
 	| SVector_lit of sexpr list * typ

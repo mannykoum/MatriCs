@@ -2,6 +2,8 @@
 
 { open Parser }
 
+let exp = ('e' | 'E') ('+' | '-')?['0'-'9']+ 
+
 rule token = parse
   [' ' '\t' '\r' '\n'] { token lexbuf } (* Whitespace *)
 | "/*"     { comment lexbuf }           (* Multi-line comments *)
@@ -35,6 +37,7 @@ rule token = parse
 | "return" { RETURN }
 
 | "int"    { INT }
+| "float"  { FLOAT }
 | "bool"   { BOOL }
 | "string" { STRTYPE }
 | "void"   { VOID }
@@ -45,6 +48,7 @@ rule token = parse
 | "false"  { FALSE }
 
 | ['0'-'9']+ as lxm { LITERAL(int_of_string lxm) }
+| ['0'-'9']+ (('.'['0'-'9']+exp?)|('.'['0'-'9']*exp?)|exp) as lxm { FLITERAL(float_of_string lxm)}
 | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { ID(lxm) }
 | '"' { read_string (Buffer.create 17) lexbuf } 
 | eof { EOF }
