@@ -28,7 +28,7 @@ let translate (globals, functions) =
   and array_t = L.array_type 
   and void_t = L.void_type context in
 
-  let ltype_of_typ = function
+  let rec ltype_of_typ = function
       A.Int -> i32_t
     | A.Bool -> i1_t
     | A.MyString -> ptr_t
@@ -38,6 +38,7 @@ let translate (globals, functions) =
         A.Int     -> array_t i32_t size
       | A.Bool  -> array_t i1_t size
       | A.MyString -> array_t ptr_t size
+      | A.Vector(typ2, size2) -> array_t (ltype_of_typ (A.Vector(typ2, size2))) size 
       | _ -> raise (Failure("Array Type Not Valid")))
     in
 

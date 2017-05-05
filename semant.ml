@@ -242,7 +242,14 @@ let check (globals, functions) =
       SLit(_) -> Int
       | SBoolLit(_) -> Bool
       | SMyStringLit(_) -> MyString
-      | SBinop(_, _, _, t)        -> t
+      | SBinop(_, op, _, t)        -> 
+      (match op with
+        Add | Sub | Mult | Div -> t
+        | Equal | Neq -> Bool
+        | Less | Leq | Greater | Geq -> Bool
+        | And | Or -> Bool
+        | _ -> raise (Failure ("should not reach here"))
+      )
       | SAssign(_, _, t)          -> t
       | SCall(_, _, t)          -> t
       | SUnop(_, _, t)          -> t
@@ -261,7 +268,7 @@ let check (globals, functions) =
         SVector_lit(selements, sast_to_typ(sexpr (List.hd elements)))    
       
       | Binop(e1, op, e2) -> let t1 = sexpr e1 and t2 = sexpr e2 in
-        SBinop(t1, op, t2, sast_to_typ(t1))
+        SBinop(t1, op, t2, sast_to_typ(SBinop(t1,op,t2,Int))) (* TODO: Ugly code *)
       | Unop(op, e) -> let t = sexpr e in
         SUnop(op, t, sast_to_typ(t))
       | Noexpr -> SNoexpr 
