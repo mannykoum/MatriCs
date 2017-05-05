@@ -1,11 +1,9 @@
-int main(){
-    int[5] a;
-    int c;
+int main (){ 
+	int[5] x;
+	int a;
+	x = [1,2,3,4,5];
+	a = x[2] + 3;
 
-    a = [1, 2, 3, 4, 5];
-
-    c = a[2];
-    print_int(c);
-
-    return 0;
+	print_int(a);
+	return 0;
 }

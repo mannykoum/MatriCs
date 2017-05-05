@@ -1,0 +1,11 @@
+int main() {
+	int[4] a;
+	a = [1, 2, 3, 4];
+
+	if (a[1] == 2) {
+		printb(true);
+	}
+	else {
+		printb(false);
+	}
+}

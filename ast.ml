@@ -9,6 +9,7 @@ type uop = Neg | Not
 
 type typ = Int | Bool | MyString | Void 
 	  | Vector of typ * int
+    | Matrix of typ * int * int
 
 type bind = typ * string
 
@@ -17,12 +18,18 @@ type expr =
   | BoolLit of bool
   | MyStringLit of string
   | Vector_lit of expr list
+  | Matrix_lit of expr list 
   | Id of string
   | Binop of expr * op * expr
   | Unop of uop * expr
-  | Assign of string * expr
+  | Assign of expr * expr
   | Call of string * expr list
   | Vector_access of string * expr
+  | Matrix_access of string * expr * expr
+  | Matrix_row of string * expr
+  | Matrix_col of string * expr
+  | Rows of string
+  | Cols of string
   | Noexpr
 
 type stmt =
@@ -69,11 +76,12 @@ let rec string_of_expr = function
   | BoolLit(false) -> "false"
   | MyStringLit(s) -> s
   | Vector_lit(el) -> "[" ^ String.concat ", " (List.map string_of_expr el) ^ "]"
+  | Matrix_lit(el) -> "[" ^ String.concat ", " (List.map string_of_expr el) ^ ";" 
   | Id(s) -> s
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Unop(o, e) -> string_of_uop o ^ string_of_expr e
-  | Assign(v, e) -> v ^ " = " ^ string_of_expr e 
+  | Assign(v, e) -> string_of_expr v ^ " = " ^ string_of_expr e 
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Vector_access(v, i) ->

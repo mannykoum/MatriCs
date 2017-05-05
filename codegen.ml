@@ -28,7 +28,7 @@ let translate (globals, functions) =
   and array_t = L.array_type 
   and void_t = L.void_type context in
 
-  let ltype_of_typ = function
+  let rec ltype_of_typ = function
       A.Int -> i32_t
     | A.Bool -> i1_t
     | A.MyString -> ptr_t
@@ -38,6 +38,7 @@ let translate (globals, functions) =
         A.Int     -> array_t i32_t size
       | A.Bool  -> array_t i1_t size
       | A.MyString -> array_t ptr_t size
+      | A.Vector(typ2, size2) -> array_t (ltype_of_typ (A.Vector(typ2, size2))) size 
       | _ -> raise (Failure("Array Type Not Valid")))
     in
 
@@ -125,11 +126,16 @@ let translate (globals, functions) =
     	    A.Neg     -> L.build_neg
           | A.Not     -> L.build_not) e' "tmp" builder
       | S.SAssign (s, e, _) -> let e' = expr builder e in
-  	      ignore (L.build_store e' (lookup s) builder); e'
+        (match s with
+          SId(var, _) -> ignore (L.build_store e' (lookup var) builder); e'
+        | SVector_access(vname, index, ty) -> 
+            let ex1 = L.build_gep (lookup vname) [|(L.const_int i32_t 0);(expr builder index)|] vname builder
+          in ignore (L.build_store e' ex1 builder); e'
+  	    | _ -> raise(Failure("should not reach here")))(*should not reach here ignore (L.build_store e' (lookup s) builder); e' *)
       | S.SCall ("print_int", [e], _) | S.SCall ("printb", [e], _) ->
   	     L.build_call printf_func [| int_format_str ; (expr builder e) |]
   	       "printf" builder
-      | S.SCall ("print", [e], _)->
+      | S.SCall ("print", [e], _) ->
           L.build_call printf_func [| (expr builder e) |] "printf" builder
       | S.SCall (f, act, _) ->
         let (fdef, fdecl) = StringMap.find f function_decls in

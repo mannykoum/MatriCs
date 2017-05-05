@@ -4,10 +4,10 @@
 open Ast
 %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA
+%token SEMI COLON LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA ROWS COLS
 %token PLUS MINUS TIMES DIVIDE ASSIGN NOT
 %token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
-%token RETURN IF ELSE FOR WHILE INT BOOL STRTYPE VOID VECTOR
+%token RETURN IF ELSE FOR WHILE INT BOOL STRTYPE VOID VECTOR MATRIX
 %token <string> STRING
 %token <int> LITERAL
 %token <string> ID
@@ -59,6 +59,7 @@ typ:
   | STRTYPE 	{ MyString }
   | VOID 	{ Void }
   | typ LBRACKET LITERAL RBRACKET {Vector($1, $3) }
+  /* | typ LBRACKET LITERAL COMMA LITERAL RBRACKET {Matrix($1, $3, $5)} */
 
 
 
@@ -108,17 +109,25 @@ expr:
   | expr OR     expr { Binop($1, Or,    $3) }
   | MINUS expr %prec NEG { Unop(Neg, $2) }
   | NOT expr         { Unop(Not, $2) }
-  | ID ASSIGN expr   { Assign($1, $3) }
+  | expr ASSIGN expr   { Assign($1, $3) }
 
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN           { $2 }
 
   | ID LBRACKET expr RBRACKET    { Vector_access($1, $3) }
   | LBRACKET vect_opt RBRACKET   { Vector_lit($2) }
+ /* | ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET  { Vector_access (Vector_access($1, $3), $6) } */
+ /* | LBRACKET matrix_opt RBRACKET       { Matrix_lit($2) } */
+  /*| ID LBRACKET expr COMMA expr RBRACKET       { Matrix_access($1, $3, $5) } */
+  /* | ID LBRACKET expr COMMA COLON RBRACKET      { Matrix_row($1, $3) } */
+  /* | ID LBRACKET COLON COMMA expr RBRACKET      { Matrix_col($1, $5) } */
+  /* | ID COLON ROWS                              { Rows($1) } */
+  /*| ID COLON COLS                              { Cols($1) } */
 
 vect_opt:
  /* nothing */  {[]} 
 |   vect_lit { List.rev $1 }
+
 
 vect_lit:
     expr                { [$1] }
@@ -132,3 +141,7 @@ actuals_opt:
 actuals_list:
     expr                    { [$1] }
   | actuals_list COMMA expr { $3 :: $1 }
+
+
+
+
