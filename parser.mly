@@ -60,10 +60,15 @@ typ:
   | BOOL 	     { Bool }
   | STRTYPE 	 { MyString }
   | VOID 	     { Void }
-  | typ LBRACKET LITERAL RBRACKET {Vector($1, $3) }
-  /* | typ LBRACKET LITERAL COMMA LITERAL RBRACKET {Matrix($1, $3, $5)} */
+  | typ LBRACKET dim_list RBRACKET {Vector($1, $3) }
 
+dim_list:
+  /* nothing */ {[]}
+| dim           { List.rev $1 }
 
+dim:
+    LITERAL                { [$1] }
+  | dim COMMA LITERAL { $3 :: $1 }
 
 vdecl_list:
     /* nothing */    { [] }
@@ -111,27 +116,31 @@ expr:
   | expr AND    expr { Binop($1, And,   $3) }
   | expr OR     expr { Binop($1, Or,    $3) }
   | MINUS expr %prec NEG { Unop(Neg, $2) }
-  | NOT expr         { Unop(Not, $2) }
-  | expr ASSIGN expr   { Assign($1, $3) }
+  | NOT expr             { Unop(Not, $2) }
+  | expr ASSIGN expr     { Assign($1, $3) }
+  /* | vinit ASSIGN expr    { Assign($1, $3) } */  
 
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN           { $2 }
 
   | ID LBRACKET expr RBRACKET    { Vector_access($1, $3) }
   | LBRACKET vect_opt RBRACKET   { Vector_lit($2) }
-/*| typ ID                       { Vdecl($1, $2) } */
- /* | ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET  { Vector_access (Vector_access($1, $3), $6) } */
- /* | LBRACKET matrix_opt RBRACKET       { Matrix_lit($2) } */
-  /*| ID LBRACKET expr COMMA expr RBRACKET       { Matrix_access($1, $3, $5) } */
-  /* | ID LBRACKET expr COMMA COLON RBRACKET      { Matrix_row($1, $3) } */
-  /* | ID LBRACKET COLON COMMA expr RBRACKET      { Matrix_col($1, $5) } */
-  /* | ID COLON ROWS                              { Rows($1) } */
-  /*| ID COLON COLS                              { Cols($1) } */
+
+/*| ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET  { Vector_access (Vector_access($1, $3), $6) } */
+/*| LBRACKET matrix_opt RBRACKET       { Matrix_lit($2) } */
+/*| ID LBRACKET expr COMMA expr RBRACKET       { Matrix_access($1, $3, $5) } */
+/*| ID LBRACKET expr COMMA COLON RBRACKET      { Matrix_row($1, $3) } */
+/*| ID LBRACKET COLON COMMA expr RBRACKET      { Matrix_col($1, $5) } */
+/*| ID COLON ROWS                              { Rows($1) } */
+/*| ID COLON COLS                              { Cols($1) } */
+
+/* 
+vinit: 
+  typ ID        { Vdecl($1, $2) }  */
 
 vect_opt:
  /* nothing */  {[]} 
-|   vect_lit { List.rev $1 }
-
+|   vect_lit    { List.rev $1 }
 
 vect_lit:
     expr                { [$1] }

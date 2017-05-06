@@ -135,7 +135,7 @@ let check (globals, functions) =
         | Vector_lit elements -> 
           let rec check_vector_types i = function
             | [] -> raise( Failure ("empty literal not allowed"))
-            | [el] -> Vector(expr el, i+1)
+            | [el] -> Vector(expr el, [i+1]) (* HACKY FIX  *)
             | fst :: snd :: tail -> 
               if (expr fst) == (expr snd) then
                 check_vector_types (i+1) (snd::tail)

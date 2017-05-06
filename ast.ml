@@ -8,7 +8,7 @@ type uop = Neg | Not
 (* HERE ADD NUM TYPE FOR FLOATS AND INTS*)
 
 type typ = Int | Float | Bool | MyString | Void 
-	  | Vector of typ * int
+	  | Vector of typ * int list
     | Matrix of typ * int * int
 
 type bind = typ * string
@@ -21,6 +21,7 @@ type expr =
   | Vector_lit of expr list
   | Matrix_lit of expr list 
   | Id of string
+  | Vdecl of bind 
   | Binop of expr * op * expr
   | Unop of uop * expr
   | Assign of expr * expr
@@ -53,6 +54,15 @@ type program = bind list * func_decl list
 
 (* Pretty-printing functions *)
 
+let rec string_of_typ = function
+    Int -> "int"
+  | Float -> "float"
+  | Bool -> "bool"
+  | MyString -> "string" 
+  | Void -> "void"
+  | Vector(t, l) -> (string_of_typ t)^"["^
+    (List.fold_left (fun str n -> str ^", "^string_of_int n) "" l)^"]"
+
 let string_of_op = function
     Add -> "+"
   | Sub -> "-"
@@ -80,6 +90,7 @@ let rec string_of_expr = function
   | Vector_lit(el) -> "[" ^ String.concat ", " (List.map string_of_expr el) ^ "]"
   | Matrix_lit(el) -> "[" ^ String.concat ", " (List.map string_of_expr el) ^ ";" 
   | Id(s) -> s
+  | Vdecl(t, s) -> string_of_typ t^" "^s
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Unop(o, e) -> string_of_uop o ^ string_of_expr e
@@ -103,15 +114,6 @@ let rec string_of_stmt = function
       "for (" ^ string_of_expr e1  ^ " ; " ^ string_of_expr e2 ^ " ; " ^
       string_of_expr e3  ^ ") " ^ string_of_stmt s
   | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
-
-let rec string_of_typ = function
-    Int -> "int"
-  | Float -> "float"
-  | Bool -> "bool"
-  | MyString -> "string" 
-  | Void -> "void"
-  | Vector(t, l) -> (string_of_typ t)^"["^(string_of_int l)^"]"
-
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 

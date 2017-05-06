@@ -35,16 +35,19 @@ let translate (globals, functions) =
     | A.Bool -> i1_t
     | A.MyString -> ptr_t
     | A.Void -> void_t 
-    | A.Vector(typ, size) ->
-      (match typ with 
+    | A.Vector(typ, szl) -> match szl with 
+      [] -> ltype_of_typ typ
+      | [x] ->  array_t (ltype_of_typ (A.Vector(typ, []))) x
+      | hd::tl -> array_t (ltype_of_typ (A.Vector(typ, tl))) hd 
+    in
+(*     (match typ with 
         A.Int     -> array_t i32_t size
       | A.Float   -> array_t f64_t size
       | A.Bool  -> array_t i1_t size
       | A.MyString -> array_t ptr_t size
-      | A.Vector(typ2, size2) -> array_t (ltype_of_typ (A.Vector(typ2, size2))) size 
+      | A.Vector(typ2, szl) -> match szl with
       | _ -> raise (Failure("Array Type Not Valid")))
-    in
-
+*)
   (* Declare each global variable; remember its value in a map *)
   let global_vars =
     let global_var m (t, n) =
