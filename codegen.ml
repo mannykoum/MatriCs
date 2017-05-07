@@ -122,12 +122,15 @@ let translate (globals, functions) =
       | S.SBinop (e1, op, e2, t1, t2, t) ->
     	  let e1' = expr builder e1
     	  and e2' = expr builder e2 in
-    	  (match op with
-    	    A.Add when t = A.Int -> L.build_add
-				| A.Add when t = A.Float -> L.build_fadd 
-    	  | A.Sub     -> L.build_sub
-    	  | A.Mult    -> L.build_mul
-              | A.Div     -> L.build_sdiv
+    	  let b = (match op with
+    	    A.Add when t = A.Int 		-> L.build_add
+				| A.Add when t = A.Float 	-> L.build_fadd 
+				| A.Sub when t = A.Int 		-> L.build_sub 
+				| A.Sub when t = A.Float 	-> L.build_fsub 
+				| A.Mult when t = A.Int 	-> L.build_mul 
+				| A.Mult when t = A.Float -> L.build_fmul 
+				| A.Div when t = A.Int 		-> L.build_sdiv 
+				| A.Div when t = A.Float 	-> L.build_fdiv 
     	  | A.And     -> L.build_and
     	  | A.Or      -> L.build_or
     	  | A.Equal   -> L.build_icmp L.Icmp.Eq
@@ -136,7 +139,17 @@ let translate (globals, functions) =
     	  | A.Leq     -> L.build_icmp L.Icmp.Sle
     	  | A.Greater -> L.build_icmp L.Icmp.Sgt
     	  | A.Geq     -> L.build_icmp L.Icmp.Sge
-    	  ) e1' e2' "tmp" builder
+    	  ) in
+				let (e1'', e2'') = match t with
+					Float ->
+						((match t1 with
+						Int -> L.build_sitofp e1' (ltype_of_typ t) "tmp1" builder
+						| _ -> e1'),
+						(match t2 with
+						Int -> L.build_sitofp e2' (ltype_of_typ t) "tmp2" builder
+						| _ -> e2'))
+					| _ -> (e1', e2')
+				in b e1'' e2'' "tmp" builder
       | S.SUnop(op, e, _) ->
     	  let e' = expr builder e in
     	  (match op with

@@ -9,7 +9,6 @@ type uop = Neg | Not
 
 type typ = Int | Float | Bool | MyString | Void 
 	  | Vector of typ * int list
-    | Matrix of typ * int * int
 
 type bind = typ * string
 
@@ -19,7 +18,6 @@ type expr =
   | BoolLit of bool
   | MyStringLit of string
   | Vector_lit of expr list
-  | Matrix_lit of expr list 
   | Id of string
   | Vdecl of bind 
   | Binop of expr * op * expr
@@ -27,9 +25,6 @@ type expr =
   | Assign of expr * expr
   | Call of string * expr list
   | Vector_access of string * expr list
-  | Matrix_access of string * expr * expr
-  | Matrix_row of string * expr
-  | Matrix_col of string * expr
   | Rows of string
   | Cols of string
   | Noexpr
@@ -88,7 +83,6 @@ let rec string_of_expr = function
   | BoolLit(false) -> "false"
   | MyStringLit(s) -> s
   | Vector_lit(el) -> "[" (* ^ String.concat ", " (List.map string_of_expr el) ^ "]" *)
-  | Matrix_lit(el) -> "[" ^ String.concat ", " (List.map string_of_expr el) ^ ";" 
   | Id(s) -> s
   | Vdecl(t, s) -> string_of_typ t^" "^s
   | Binop(e1, o, e2) ->
