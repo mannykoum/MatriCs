@@ -26,7 +26,7 @@ type expr =
   | Unop of uop * expr
   | Assign of expr * expr
   | Call of string * expr list
-  | Vector_access of string * expr
+  | Vector_access of string * expr list
   | Matrix_access of string * expr * expr
   | Matrix_row of string * expr
   | Matrix_col of string * expr
@@ -98,7 +98,8 @@ let rec string_of_expr = function
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Vector_access(v, i) ->
-      v ^ "[" ^ string_of_expr i ^ "]"
+      v ^ "[" ^ 
+      (List.fold_left (fun str n -> str ^", "^string_of_expr n) "" i) ^"]"
   | Noexpr -> ""
   (*ADD PATTERN FOR VECTOR_LIT AND VECTOR_ACCESS*)
 

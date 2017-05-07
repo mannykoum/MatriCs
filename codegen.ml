@@ -100,7 +100,15 @@ let translate (globals, functions) =
     in
 
     (* Construct code for an expression; return its value *)
-    let rec expr builder = function
+    let rec expr builder ex =  
+      let build_vect vname indices assign =  
+        if assign > 0 then
+          L.build_gep (lookup vname) (Array.append [|L.const_int i32_t 0|] (Array.of_list (List.map (fun e -> expr builder e) indices))) vname builder
+        else 
+          L.build_load (L.build_gep (lookup vname) (Array.append [|L.const_int i32_t 0|] (Array.of_list (List.map (fun e -> expr builder e) indices))) vname builder) vname builder
+
+      in 
+    (match ex with 
 	   S.SLit i -> L.const_int i32_t i
       | S.SFlit f -> L.const_float f64_t f
       | S.SBoolLit b -> L.const_int i1_t (if b then 1 else 0)
@@ -136,9 +144,10 @@ let translate (globals, functions) =
       | S.SAssign (s, e, _) -> let e' = expr builder e in
         (match s with
           SId(var, _) -> ignore (L.build_store e' (lookup var) builder); e'
-        | SVector_access(vname, index, ty) -> 
-            let ex1 = L.build_gep (lookup vname) [|(L.const_int i32_t 0);(expr builder index)|] vname builder
-          in ignore (L.build_store e' ex1 builder); e'
+        | SVector_access(vname, idx, ty) -> let gep = build_vect vname idx 1 in 
+            ignore (L.build_store e' gep builder); e'
+          (* let ex1 = L.build_gep (lookup vname) [|(L.const_int i32_t 0);(expr builder index)|] vname builder
+          in ignore (L.build_store e' ex1 builder); e' *)
   	    | _ -> raise(Failure("should not reach here")))(*should not reach here ignore (L.build_store e' (lookup s) builder); e' *)
       | S.SCall ("print_int", [e], _) | S.SCall ("printb", [e], _) ->
   	     L.build_call printf_func [| int_format_str ; (expr builder e) |]
@@ -155,8 +164,9 @@ let translate (globals, functions) =
                                               | _ -> f ^ "_result") in
            L.build_call fdef (Array.of_list actuals) result builder
       | S.SVector_access (vname, idx, typ) -> 
+            build_vect vname idx 0)
       (* Make separate function, first index needs to be 0 *)
-        L.build_load (L.build_gep (lookup vname) [| (L.const_int i32_t 0); (expr builder idx) |] vname builder) vname builder
+      (*  L.build_load (L.build_gep (lookup vname) [| (L.const_int i32_t 0); (expr builder idx) |] vname builder) vname builder *)
 
       in
 

@@ -123,7 +123,7 @@ expr:
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN           { $2 }
 
-  | ID LBRACKET expr RBRACKET    { Vector_access($1, $3) }
+  | ID LBRACKET explst RBRACKET    { Vector_access($1, List.rev $3) }
   | LBRACKET vect_opt RBRACKET   { Vector_lit($2) }
 
 /*| ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET  { Vector_access (Vector_access($1, $3), $6) } */
@@ -137,6 +137,10 @@ expr:
 /* 
 vinit: 
   typ ID        { Vdecl($1, $2) }  */
+
+explst:
+    expr                { [$1] }
+  | explst COMMA expr   { $3 :: $1 }
 
 vect_opt:
  /* nothing */  {[]} 

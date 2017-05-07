@@ -187,15 +187,20 @@ let check (globals, functions) =
                   " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))))
                fd.formals actuals;
              fd.typ
-        | Vector_access(nm, idx) -> let idxtyp = expr idx in 
-          let Vector(typ, sz) = type_of_identifier nm in 
-          if idxtyp != Int then raise (Failure ("array " ^ nm 
+        | Vector_access(nm, ilst) -> let Vector(typ, sz) = type_of_identifier nm in
+          let rec check_i = function
+            [idx] -> let idxtyp = expr idx in
+                  if idxtyp != Int then raise (Failure ("array " ^ nm 
+                    ^ " index not an integer"))
+                  else typ
+            | hd::tl -> let idxtyp = expr hd in
+            if idxtyp != Int then raise (Failure ("array " ^ nm 
                  ^ " index not an integer"))
+            else check_i tl in check_i ilst
           (* TODO: TRY IMPLEMENTING INDEX OUT OF BOUNDS 
           else let Vector(typ, sz) = type_of_identifier nm in 
             if (sz - 1) < idx then raise (Failure ("array " ^ nm 
                  ^ " index out of bounds")) *)
-            else typ
     in
 
     let check_bool_expr e = if expr e != Bool
@@ -243,6 +248,7 @@ let check (globals, functions) =
     let sast_to_typ = function
       SId(_, t) -> t
       | SLit(_) -> Int
+      | SFlit(_) -> Float 
       | SBoolLit(_) -> Bool
       | SMyStringLit(_) -> MyString
       | SBinop(_, op, _, t)        -> 
@@ -304,7 +310,7 @@ let check (globals, functions) =
           let sactuals = List.map sexpr actuals in
           SCall(fname, sactuals, fd.typ) (* sast_to_typ(sexpr (List.hd sactuals))) *)
       | Vector_access(vname, idx) -> let Vector(typ, _) = type_of_identifier vname in 
-          let sidx = sexpr idx in
+          let sidx = List.map sexpr idx in 
           SVector_access(vname, sidx, typ)
 
     in
