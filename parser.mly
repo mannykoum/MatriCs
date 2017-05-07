@@ -97,12 +97,7 @@ expr_opt:
   | expr          { $1 }
 
 expr:
-    LITERAL          { Literal($1) }
-  | FLITERAL         { Fliteral($1)  }
-  | TRUE             { BoolLit(true) }
-  | FALSE            { BoolLit(false) }
-  | ID               { Id($1) }
-  | STRING           { MyStringLit($1) } 
+    literal          {$1}
   | expr PLUS   expr { Binop($1, Add,   $3) }
   | expr MINUS  expr { Binop($1, Sub,   $3) }
   | expr TIMES  expr { Binop($1, Mult,  $3) }
@@ -124,7 +119,7 @@ expr:
   | LPAREN expr RPAREN           { $2 }
 
   | ID LBRACKET explst RBRACKET    { Vector_access($1, List.rev $3) }
-  | LBRACKET vect_opt RBRACKET   { Vector_lit($2) }
+  | vector                         { Vector_lit($1) }
 
 /*| ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET  { Vector_access (Vector_access($1, $3), $6) } */
 /*| LBRACKET matrix_opt RBRACKET       { Matrix_lit($2) } */
@@ -133,23 +128,34 @@ expr:
 /*| ID LBRACKET COLON COMMA expr RBRACKET      { Matrix_col($1, $5) } */
 /*| ID COLON ROWS                              { Rows($1) } */
 /*| ID COLON COLS                              { Cols($1) } */
+  
+literal:
+    LITERAL          { Literal($1) }
+  | FLITERAL         { Fliteral($1)  }
+  | TRUE             { BoolLit(true) }
+  | FALSE            { BoolLit(false) }
+  | ID               { Id($1) }
+  | STRING           { MyStringLit($1) } 
 
 /* 
 vinit: 
   typ ID        { Vdecl($1, $2) }  */
 
+vector:
+   LBRACKET RBRACKET                  {[]}
+|  LBRACKET vect_list RBRACKET        {List.rev $2}
+
+vect_list:
+  vect_element                        {[$1]} 
+| vect_list COMMA vect_element         { $3 :: $1 }
+
+vect_element:
+  vector                              {Vector_lit($1)}
+| literal                             {$1}
+
 explst:
     expr                { [$1] }
   | explst COMMA expr   { $3 :: $1 }
-
-vect_opt:
- /* nothing */  {[]} 
-|   vect_lit    { List.rev $1 }
-
-vect_lit:
-    expr                { [$1] }
-  | vect_lit COMMA expr { $3 :: $1 }
-
 
 actuals_opt:
     /* nothing */ { [] }

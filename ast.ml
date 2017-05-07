@@ -87,7 +87,7 @@ let rec string_of_expr = function
   | BoolLit(true) -> "true"
   | BoolLit(false) -> "false"
   | MyStringLit(s) -> s
-  | Vector_lit(el) -> "[" ^ String.concat ", " (List.map string_of_expr el) ^ "]"
+  | Vector_lit(el) -> "[" (* ^ String.concat ", " (List.map string_of_expr el) ^ "]" *)
   | Matrix_lit(el) -> "[" ^ String.concat ", " (List.map string_of_expr el) ^ ";" 
   | Id(s) -> s
   | Vdecl(t, s) -> string_of_typ t^" "^s
