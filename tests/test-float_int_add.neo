@@ -1,0 +1,11 @@
+int main() {
+	float a;
+	int b;
+	float c;
+	
+	a = 5.0;
+	b = 5;
+	c = a + b;
+	print_float(c);
+	return 0;
+}

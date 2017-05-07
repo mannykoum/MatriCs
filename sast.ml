@@ -8,7 +8,7 @@ type sexpr =
 	| SMyStringLit of string
 	| SVector_lit of sexpr list * typ
 	| SId of string * typ
-	| SBinop of sexpr * op * sexpr * typ
+	| SBinop of sexpr * op * sexpr * typ * typ * typ
 	| SUnop of uop * sexpr * typ
 	| SAssign of sexpr * sexpr * typ
 	| SCall of string * sexpr list * typ

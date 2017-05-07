@@ -125,6 +125,30 @@ let check (globals, functions) =
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
+    let match_binop t1 t2 op e =
+      (match op with
+      Add | Sub | Mult | Div -> 
+				(match t1 with
+      		Int -> 
+						(match t2 with 
+							Int -> Int
+							| Float -> Float
+							| _ -> raise (Failure ("undefined operation " ^
+          			string_of_op op ^ "on type " ^ string_of_typ t2)))
+      		| Float -> Float
+					| _ -> raise (Failure ("undefined operation " ^
+          			string_of_op op ^ "on type " ^ string_of_typ t1)))
+ 	   	| Equal | Neq when t1 = t2 -> Bool
+  	 	| Less | Leq | Greater | Geq 
+				when t1 = Int && t2 = Int -> Bool
+  	 	| Less | Leq | Greater | Geq 
+				when t1 = Float && t2 = Float -> Bool
+   	 	| And | Or when t1 = Bool && t2 = Bool -> Bool
+   	 	| _ -> raise (Failure ("illegal binary operator " ^
+          string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
+          string_of_typ t2 ^ " in " ^ string_of_expr e)))
+		in
+
     (* Return the type of an expression or throw an exception *)
     let rec expr = function
   	     Literal _ -> Int
@@ -144,18 +168,31 @@ let check (globals, functions) =
           in check_vector_types 0 elements 
         
         | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
-        	(match op with
-                Add | Sub | Mult | Div when t1 = Int && t2 = Int -> Int
-              | Equal | Neq when t1 = t2 -> Bool
-              | Less | Leq | Greater | Geq when t1 = Int && t2 = Int -> Bool
-              | And | Or when t1 = Bool && t2 = Bool -> Bool
-              | _ -> raise (Failure ("illegal binary operator " ^
-                    string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
-                    string_of_typ t2 ^ " in " ^ string_of_expr e))
-          )
-        | Unop(op, e) as ex -> let t = expr e in
+		      (match op with
+		      Add | Sub | Mult | Div -> 
+						(match t1 with
+		      		Int -> 
+								(match t2 with 
+									Int -> Int
+									| Float -> Float
+									| _ -> raise (Failure ("undefined operation " ^
+		          			string_of_op op ^ "on type " ^ string_of_typ t2)))
+		      		| Float -> Float
+							| _ -> raise (Failure ("undefined operation " ^
+		          			string_of_op op ^ "on type " ^ string_of_typ t1)))
+		 	   	| Equal | Neq when t1 = t2 -> Bool
+		  	 	| Less | Leq | Greater | Geq 
+						when t1 = Int && t2 = Int -> Bool
+		  	 	| Less | Leq | Greater | Geq 
+						when t1 = Float && t2 = Float -> Bool
+		   	 	| And | Or when t1 = Bool && t2 = Bool -> Bool
+		   	 	| _ -> raise (Failure ("illegal binary operator " ^
+		          string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
+		          string_of_typ t2 ^ " in " ^ string_of_expr e)))
+				| Unop(op, e) as ex -> let t = expr e in
         	(match op with
           	    Neg when t = Int -> Int
+							|	Neg when t = Float -> Float
           	  | Not when t = Bool -> Bool
                     | _ -> raise (Failure ("illegal unary operator " ^ string_of_uop op ^
           	  		    string_of_typ t ^ " in " ^ string_of_expr ex))
@@ -251,14 +288,14 @@ let check (globals, functions) =
       | SFlit(_) -> Float 
       | SBoolLit(_) -> Bool
       | SMyStringLit(_) -> MyString
-      | SBinop(_, op, _, t)        -> 
-      (match op with
+      | SBinop(_, op, _, _, _, t) -> t
+      (*(match op with
         Add | Sub | Mult | Div -> t
         | Equal | Neq -> Bool
         | Less | Leq | Greater | Geq -> Bool
         | And | Or -> Bool
         | _ -> raise (Failure ("should not reach here"))
-      )
+      )*)
       | SAssign(_, _, t)          -> t
       | SCall(_, _, t)          -> t
       | SUnop(_, _, t)          -> t
@@ -276,10 +313,31 @@ let check (globals, functions) =
       | Vector_lit elements -> 
         let selements = List.map sexpr elements in
         SVector_lit(selements, sast_to_typ(sexpr (List.hd elements)))    
-      
-      | Binop(e1, op, e2) -> let t1 = sexpr e1 and t2 = sexpr e2 in
-        SBinop(t1,op,t2, sast_to_typ(t1)) (* This only checks t1!! Maybe modify later *)
-
+      | Binop(e1, op, e2) as e -> let t1 = sexpr e1 and t2 = sexpr e2 in
+	      let typ1 = sast_to_typ t1 and typ2 = sast_to_typ t2 in
+				let typ_of_bop = 
+					(match op with
+		      Add | Sub | Mult | Div -> 
+						(match typ1 with
+		      		Int -> 
+								(match typ2 with 
+									Int -> Int
+									| Float -> Float
+									| _ -> raise (Failure ("undefined operation " ^
+		          			string_of_op op ^ "on type " ^ string_of_typ typ2)))
+		      		| Float -> Float
+							| _ -> raise (Failure ("undefined operation " ^
+		          			string_of_op op ^ "on type " ^ string_of_typ typ1)))
+		 	   	| Equal | Neq when typ1 = typ2 -> Bool
+		  	 	| Less | Leq | Greater | Geq 
+						when typ1 = Int && typ2 = Int -> Bool
+		  	 	| Less | Leq | Greater | Geq 
+						when typ1 = Float && typ2 = Float -> Bool
+		   	 	| And | Or when typ1 = Bool && typ2 = Bool -> Bool
+		   	 	| _ -> raise (Failure ("illegal binary operator " ^
+		          string_of_typ typ1 ^ " " ^ string_of_op op ^ " " ^
+		          string_of_typ typ2))) in
+        SBinop(t1, op, t2, typ1, typ2, typ_of_bop)
       | Unop(op, e) -> let t = sexpr e in
         SUnop(op, t, sast_to_typ(t))
       | Noexpr -> SNoexpr 

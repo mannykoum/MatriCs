@@ -119,11 +119,12 @@ let translate (globals, functions) =
         let lst = List.map (expr builder) el in
         let arr = Array.of_list lst in
           L.const_array (ltype_of_typ ty) arr
-      | S.SBinop (e1, op, e2, _) ->
+      | S.SBinop (e1, op, e2, t1, t2, t) ->
     	  let e1' = expr builder e1
     	  and e2' = expr builder e2 in
     	  (match op with
-    	    A.Add     -> L.build_add
+    	    A.Add when t = A.Int -> L.build_add
+				| A.Add when t = A.Float -> L.build_fadd 
     	  | A.Sub     -> L.build_sub
     	  | A.Mult    -> L.build_mul
               | A.Div     -> L.build_sdiv
