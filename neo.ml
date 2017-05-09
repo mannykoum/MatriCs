@@ -1,6 +1,15 @@
 (* Top-level of the MicroC compiler: scan & parse the input,
    check the resulting AST, generate LLVM IR, and dump the module *)
 
+open Preprocess
+open Ast
+open Semant
+open Sast
+open Parser
+open Scanner
+open Codegen
+open Llvm
+
 type action = Ast | LLVM_IR | Compile
 
 let _ =
@@ -9,7 +18,14 @@ let _ =
 			      ("-l", LLVM_IR);  (* Generate LLVM, don't check *)
 			      ("-c", Compile) ] (* Generate, check LLVM IR *)
   else Compile in
-  let lexbuf = Lexing.from_channel stdin in
+  let infile =
+        if (Array.length Sys.argv > 2)
+            then Sys.argv.(2)
+            else raise(Failure("No Filename Argument Found " ^ Sys.argv.(2)))
+  in
+  let prepo = Preprocess.process infile in
+  ignore(print_string prepo);
+  let lexbuf = Lexing.from_string prepo in
   let ast = Parser.program Scanner.token lexbuf in
   let sast = Semant.check ast in
   match action with
