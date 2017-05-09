@@ -5,7 +5,7 @@
 #  Compile, run, and check the output of each expected-to-work test
 #  Compile and check the error of each expected-to-fail test
 
-MICROC="./neo.native"
+NEONATIVE="./neo.native"
 LLI="lli"
 
 # Set time limit for all operations
@@ -18,7 +18,7 @@ globalerror=0
 
 keep=0
 
-if [ ! -f $MICROC ]; then
+if [ ! -f $NEONATIVE ]; then
     echo "binary .native file is not present. Exiting."
     exit 1
 fi
@@ -52,6 +52,7 @@ Compare() {
 # Run <args>
 # Report the command, run it, and report any errors
 Run() {
+    echo $*
     echo $* 1>&2
     eval $* || {
 	SignalError "$1 failed on $*"
@@ -85,7 +86,7 @@ Check() {
     generatedfiles=""
 
     generatedfiles="$generatedfiles ${basename}.ll ${basename}.out" &&
-    Run "$MICROC" "<" $1 ">" "${basename}.ll" &&
+    Run "$NEONATIVE" "-c" $1 ">" "${basename}.ll" &&
     Run "$LLI" "${basename}.ll" ">" "${basename}.out" &&
     Compare ${basename}.out ${reffile}.out ${basename}.diff
 
@@ -118,7 +119,7 @@ CheckFail() {
     generatedfiles=""
 
     generatedfiles="$generatedfiles ${basename}.err ${basename}.diff" &&
-    RunFail "$MICROC" "<" $1 "2>" "${basename}.err" ">>" $globallog &&
+    RunFail "$NEONATIVE" "-c" $1 "2>" "${basename}.err" ">>" $globallog &&
     Compare ${basename}.err ${reffile}.err ${basename}.diff
 
     # Report the status and clean up the generated files

@@ -24,7 +24,6 @@ let _ =
             else raise(Failure("No Filename Argument Found " ^ Sys.argv.(2)))
   in
   let prepo = Preprocess.process infile in
-  ignore(print_string prepo);
   let lexbuf = Lexing.from_string prepo in
   let ast = Parser.program Scanner.token lexbuf in
   let sast = Semant.check ast in
