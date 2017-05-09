@@ -117,7 +117,8 @@ let translate (globals, functions) =
       | S.SId(s, _) -> L.build_load (lookup s) s builder
       | S.SVector_lit(el, ty, diml) -> (match diml with 
          [x] -> L.const_array (ltype_of_typ ty) (Array.of_list (List.map (expr builder) el))
-        | hd::tl -> L.const_array (array_t (ltype_of_typ ty) hd) (Array.of_list (List.map (expr builder) el)))
+        | hd::tl -> L.const_array (ltype_of_typ (A.Vector(ty,tl))) (Array.of_list (List.map (expr builder) el)))
+
 (*        match diml with 
         [] -> L.const_array (ltype_of_typ ty) 
         | [x] ->  L.const_array array_t ((A.Vector(ty, []))) x

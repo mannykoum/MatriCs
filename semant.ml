@@ -311,6 +311,7 @@ let check (globals, functions) =
       | BoolLit b -> SBoolLit(b)
       | Id s -> SId(s, type_of_identifier s)
       | MyStringLit st -> SMyStringLit(st)
+
       | Vector_lit elements ->
         let rec check_vect dimlist elm = 
           let el = List.hd elm in 
@@ -319,7 +320,11 @@ let check (globals, functions) =
               | x -> ((List.length elm :: dimlist), sexpr x) 
         in let dml, xtyp = check_vect [] elements 
         and selements = List.map sexpr elements in
-        SVector_lit(selements, (sast_to_typ xtyp) , dml)    
+        (* SVector_lit(selements, (sast_to_typ xtyp), dml) *)
+        let head = List.hd selements in
+          (match head with
+           _ -> SVector_lit(selements, (sast_to_typ xtyp), dml) 
+          | SVector_lit(_, childtyp , childdml) -> SVector_lit(selements, Vector(childtyp, childdml), dml))
       | Binop(e1, op, e2) as e -> let t1 = sexpr e1 and t2 = sexpr e2 in
 	      let typ1 = sast_to_typ t1 and typ2 = sast_to_typ t2 in
 				let typ_of_bop = 
