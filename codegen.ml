@@ -115,10 +115,22 @@ let translate (globals, functions) =
       | S.SMyStringLit str -> L.build_global_stringptr str "tmp" builder
       | S.SNoexpr -> L.const_int i32_t 0
       | S.SId(s, _) -> L.build_load (lookup s) s builder
-      | S.SVector_lit(el, ty) -> 
+      | S.SVector_lit(el, ty, diml) -> (match diml with 
+         [x] -> L.const_array (ltype_of_typ ty) (Array.of_list (List.map (expr builder) el))
+        | hd::tl -> L.const_array (array_t (ltype_of_typ ty) hd) (Array.of_list (List.map (expr builder) el)))
+(*        match diml with 
+        [] -> L.const_array (ltype_of_typ ty) 
+        | [x] ->  L.const_array array_t ((A.Vector(ty, []))) x
+        | hd::tl -> *)  
+(*
         let lst = List.map (expr builder) el in
         let arr = Array.of_list lst in
-          L.const_array (ltype_of_typ ty) arr
+        let makevect vty = function
+        | SVector_lit(el, _, _) -> L.const_array (A.Vector()) arr
+        | 
+        array_t (ltype_of_typ (A.Vector(typ, []))) x
+        in makevect List.hd lst 
+          L.const_array (ltype_of_typ ty) arr *)
       | S.SBinop (e1, op, e2, t1, t2, t) ->
     	  let e1' = expr builder e1
     	  and e2' = expr builder e2 in

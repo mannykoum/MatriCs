@@ -6,7 +6,7 @@ type sexpr =
 	| SFlit of float
 	| SBoolLit of bool
 	| SMyStringLit of string
-	| SVector_lit of sexpr list * typ
+	| SVector_lit of sexpr list * typ * int list
 	| SId of string * typ
 	| SBinop of sexpr * op * sexpr * typ * typ * typ
 	| SUnop of uop * sexpr * typ
