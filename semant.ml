@@ -15,7 +15,7 @@ let check (globals, functions) =
   (* Raise an exception if the given list has a duplicate *)
   let report_duplicate exceptf list =
     let rec helper = function
-	n1 :: n2 :: _ when n1 = n2 -> raise (Failure (exceptf n1))
+	     n1 :: n2 :: _ when n1 = n2 -> raise (Failure (exceptf n1))
       | _ :: t -> helper t
       | [] -> ()
     in helper (List.sort compare list)
@@ -156,7 +156,8 @@ let check (globals, functions) =
         | BoolLit _ -> Bool
         | Id s -> type_of_identifier s
         | MyStringLit _ -> MyString
-        | Vector_lit elements -> 
+        | Vector_lit elements -> Vector(Int, [5])
+        (*
           let rec check_vector_types i = function
             | [] -> raise( Failure ("empty literal not allowed"))
             | [el] -> Vector(expr el, [i+1]) (* HACKY FIX  *)
@@ -166,7 +167,7 @@ let check (globals, functions) =
               else raise (Failure ("unmatched element types in vector literal " ^
                 string_of_typ (expr fst) ^ ", " ^ string_of_typ (expr snd))) 
           in check_vector_types 0 elements 
-        
+        *)
         | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
 		      (match op with
 		      Add | Sub | Mult | Div -> 
@@ -310,9 +311,15 @@ let check (globals, functions) =
       | BoolLit b -> SBoolLit(b)
       | Id s -> SId(s, type_of_identifier s)
       | MyStringLit st -> SMyStringLit(st)
-      | Vector_lit elements -> 
-        let selements = List.map sexpr elements in
-        SVector_lit(selements, sast_to_typ(sexpr (List.hd elements)))    
+      | Vector_lit elements ->
+        let rec check_vect dimlist elm = 
+          let el = List.hd elm in 
+            match el with 
+              Vector_lit(ellist) -> check_vect (List.length elm :: dimlist) ellist 
+              | x -> ((List.length elm :: dimlist), sexpr x) 
+        in let dml, xtyp = check_vect [] elements 
+        and selements = List.map sexpr elements in
+        SVector_lit(selements, (sast_to_typ xtyp) , dml)    
       | Binop(e1, op, e2) as e -> let t1 = sexpr e1 and t2 = sexpr e2 in
 	      let typ1 = sast_to_typ t1 and typ2 = sast_to_typ t2 in
 				let typ_of_bop = 
