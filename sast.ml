@@ -13,9 +13,7 @@ type sexpr =
 	| SAssign of sexpr * sexpr * typ
 	| SCall of string * sexpr list * typ
 	| SVector_access of string * sexpr list * typ
-<<<<<<< HEAD
 	| SDimlist of string
->>>>>>> 4add73e6a849213f73572d88445753d0c570d91f
 	| SNoexpr
 
 (* Statements *)
