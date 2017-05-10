@@ -1,0 +1,137 @@
+
+###### Testing test-add_matrices
+./neo.native -c tests/test-add_matrices.neo > test-add_matrices.ll
+lli test-add_matrices.ll > test-add_matrices.out
+diff -b test-add_matrices.out tests/test-add_matrices.out > test-add_matrices.diff
+###### SUCCESS
+
+###### Testing test-comments
+./neo.native -c tests/test-comments.neo > test-comments.ll
+lli test-comments.ll > test-comments.out
+diff -b test-comments.out tests/test-comments.out > test-comments.diff
+###### SUCCESS
+
+###### Testing test-empty
+./neo.native -c tests/test-empty.neo > test-empty.ll
+lli test-empty.ll > test-empty.out
+diff -b test-empty.out tests/test-empty.out > test-empty.diff
+###### SUCCESS
+
+###### Testing test-float_add
+./neo.native -c tests/test-float_add.neo > test-float_add.ll
+lli test-float_add.ll > test-float_add.out
+diff -b test-float_add.out tests/test-float_add.out > test-float_add.diff
+###### SUCCESS
+
+###### Testing test-float_int_add
+./neo.native -c tests/test-float_int_add.neo > test-float_int_add.ll
+lli test-float_int_add.ll > test-float_int_add.out
+diff -b test-float_int_add.out tests/test-float_int_add.out > test-float_int_add.diff
+###### SUCCESS
+
+###### Testing test-hello_world
+./neo.native -c tests/test-hello_world.neo > test-hello_world.ll
+lli test-hello_world.ll > test-hello_world.out
+diff -b test-hello_world.out tests/test-hello_world.out > test-hello_world.diff
+###### SUCCESS
+
+###### Testing test-matliteral
+./neo.native -c tests/test-matliteral.neo > test-matliteral.ll
+lli test-matliteral.ll > test-matliteral.out
+diff -b test-matliteral.out tests/test-matliteral.out > test-matliteral.diff
+###### SUCCESS
+
+###### Testing test-matliteral2
+./neo.native -c tests/test-matliteral2.neo > test-matliteral2.ll
+lli test-matliteral2.ll > test-matliteral2.out
+diff -b test-matliteral2.out tests/test-matliteral2.out > test-matliteral2.diff
+###### SUCCESS
+
+###### Testing test-matrix_access
+./neo.native -c tests/test-matrix_access.neo > test-matrix_access.ll
+lli test-matrix_access.ll > test-matrix_access.out
+diff -b test-matrix_access.out tests/test-matrix_access.out > test-matrix_access.diff
+###### SUCCESS
+
+###### Testing test-print_boolean
+./neo.native -c tests/test-print_boolean.neo > test-print_boolean.ll
+lli test-print_boolean.ll > test-print_boolean.out
+diff -b test-print_boolean.out tests/test-print_boolean.out > test-print_boolean.diff
+###### SUCCESS
+
+###### Testing test-print_chvelement
+./neo.native -c tests/test-print_chvelement.neo > test-print_chvelement.ll
+lli test-print_chvelement.ll > test-print_chvelement.out
+diff -b test-print_chvelement.out tests/test-print_chvelement.out > test-print_chvelement.diff
+###### SUCCESS
+
+###### Testing test-print_chvelement1
+./neo.native -c tests/test-print_chvelement1.neo > test-print_chvelement1.ll
+lli test-print_chvelement1.ll > test-print_chvelement1.out
+diff -b test-print_chvelement1.out tests/test-print_chvelement1.out > test-print_chvelement1.diff
+###### SUCCESS
+
+###### Testing test-print_false
+./neo.native -c tests/test-print_false.neo > test-print_false.ll
+lli test-print_false.ll > test-print_false.out
+diff -b test-print_false.out tests/test-print_false.out > test-print_false.diff
+###### SUCCESS
+
+###### Testing test-print_int
+./neo.native -c tests/test-print_int.neo > test-print_int.ll
+lli test-print_int.ll > test-print_int.out
+diff -b test-print_int.out tests/test-print_int.out > test-print_int.diff
+###### SUCCESS
+
+###### Testing test-print_string
+./neo.native -c tests/test-print_string.neo > test-print_string.ll
+lli test-print_string.ll > test-print_string.out
+diff -b test-print_string.out tests/test-print_string.out > test-print_string.diff
+###### SUCCESS
+
+###### Testing test-print_true
+./neo.native -c tests/test-print_true.neo > test-print_true.ll
+lli test-print_true.ll > test-print_true.out
+diff -b test-print_true.out tests/test-print_true.out > test-print_true.diff
+###### SUCCESS
+
+###### Testing test-print_velement
+./neo.native -c tests/test-print_velement.neo > test-print_velement.ll
+lli test-print_velement.ll > test-print_velement.out
+diff -b test-print_velement.out tests/test-print_velement.out > test-print_velement.diff
+###### SUCCESS
+
+###### Testing test-print_velementif
+./neo.native -c tests/test-print_velementif.neo > test-print_velementif.ll
+lli test-print_velementif.ll > test-print_velementif.out
+diff -b test-print_velementif.out tests/test-print_velementif.out > test-print_velementif.diff
+###### SUCCESS
+
+###### Testing test-print_velementif1
+./neo.native -c tests/test-print_velementif1.neo > test-print_velementif1.ll
+lli test-print_velementif1.ll > test-print_velementif1.out
+diff -b test-print_velementif1.out tests/test-print_velementif1.out > test-print_velementif1.diff
+###### SUCCESS
+
+###### Testing test-print_while
+./neo.native -c tests/test-print_while.neo > test-print_while.ll
+lli test-print_while.ll > test-print_while.out
+diff -b test-print_while.out tests/test-print_while.out > test-print_while.diff
+###### SUCCESS
+
+###### Testing test-row_column
+./neo.native -c tests/test-row_column.neo > test-row_column.ll
+lli test-row_column.ll > test-row_column.out
+diff -b test-row_column.out tests/test-row_column.out > test-row_column.diff
+###### SUCCESS
+
+###### Testing test-vector
+./neo.native -c tests/test-vector.neo > test-vector.ll
+lli test-vector.ll > test-vector.out
+diff -b test-vector.out tests/test-vector.out > test-vector.diff
+###### SUCCESS
+
+###### Testing fail-assign1
+./neo.native -c tests/fail-assign1.neo 2> fail-assign1.err >> testall.log
+diff -b fail-assign1.err tests/fail-assign1.err > fail-assign1.diff
+###### SUCCESS
