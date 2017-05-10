@@ -1,0 +1,21 @@
+#include <stdlib.neo>
+
+float[2,2] inverseMat2by2(int[2,2] a) {
+    float[2,2] b;
+    float inv_mult;
+
+    inv_mult = 1.0/((a[0,0]*a[1,1]) - (a[0,1]*a[1,0]));
+
+    b[0,0] = inv_mult * a[1,1];
+    b[0,1] = (inv_mult * a[0,1]) * -1;
+    b[1,0] = (inv_mult * a[1,0]) * -1;
+    b[1,1] = inv_mult * a[0,0];
+}
+
+int main() {
+    int[2,2] a;
+    a = [[4,7],[2,6]];
+    
+
+    print2d_f(b);
+}
