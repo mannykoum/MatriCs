@@ -1,0 +1,27 @@
+int main() {
+	int[4] a;
+	int i;
+	int c;
+	int counter;
+
+	a = [1, 2, 3, 4];
+	c = 4;
+	counter = 0;
+	
+	print("[");
+	while(c > 0) {
+		if(counter == 0) {
+			print_int(a[counter]);
+			counter = counter + 1;
+			c = c - 1;
+		}
+		else {
+			print(",");
+			print_int(a[counter]);
+			counter = counter + 1;
+			c = c - 1;
+			// print(",");
+		}
+	}
+	print("]"); 
+}
