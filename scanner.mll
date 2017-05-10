@@ -30,6 +30,8 @@ rule token = parse
 | "&&"     { AND }
 | "||"     { OR }
 | "!"      { NOT }
+| "++"     { PLUSPLUS }
+| "--"     { MINMIN }
 | "if"     { IF }
 | "else"   { ELSE }
 | "for"    { FOR }
