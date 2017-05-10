@@ -163,7 +163,7 @@ let translate (globals, functions) =
 						| _ -> e2'))
 					| _ -> (e1', e2')
 				in b e1'' e2'' "tmp" builder
-      | S.SUnop(op, e, _) ->
+      | S.SUnop(op, e, t) ->
     	  let e' = expr builder e in
     	  (match op with
     	    A.Neg     -> L.build_neg

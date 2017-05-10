@@ -5,6 +5,8 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
 
 type uop = Neg | Not
 
+type uopment = Increment | Decrement 
+
 (* HERE ADD NUM TYPE FOR FLOATS AND INTS*)
 
 type typ = Int | Float | Bool | MyString | Void 
@@ -22,6 +24,7 @@ type expr =
   | Vdecl of bind 
   | Binop of expr * op * expr
   | Unop of uop * expr
+  | Incrementer of expr * uopment
   | Assign of expr * expr
   | Call of string * expr list
   | Vector_access of string * expr list
@@ -77,6 +80,10 @@ let string_of_uop = function
     Neg -> "-"
   | Not -> "!"
 
+let string_of_uopment = function
+    Increment -> "++"
+  | Decrement -> "--"
+
 let rec string_of_expr = function
     Literal(l) -> string_of_int l
   | Fliteral(f) -> string_of_float f
@@ -89,6 +96,7 @@ let rec string_of_expr = function
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Unop(o, e) -> string_of_uop o ^ string_of_expr e
+  | Incrementer(e, uop) -> string_of_expr e ^" "^ string_of_uopment uop
   | Assign(v, e) -> string_of_expr v ^ " = " ^ string_of_expr e 
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
