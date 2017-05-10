@@ -195,11 +195,9 @@ let translate (globals, functions) =
                                               | _ -> f ^ "_result") in
            L.build_call fdef (Array.of_list actuals) result builder
       | S.SVector_access (vname, idx, typ) -> 
-            build_vect vname idx 0)
-(*
-      | S.SDims(v) -> (match v with 
-          Vector(t,dl) -> L.const_array i32_t (Array.of_list (List.map (expr builder) dl))
-          | _ -> raise (Failure ("dims cannot be called on non-Vector types"))) *)
+            build_vect vname idx 0
+
+      | S.SDimlist (v, dl) -> L.const_array i32_t (Array.of_list (List.map (fun i -> L.const_int i32_t i) dl)))
       (* Make separate function, first index needs to be 0 *)
       (*  L.build_load (L.build_gep (lookup vname) [| (L.const_int i32_t 0); (expr builder idx) |] vname builder) vname builder *)
 

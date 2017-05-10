@@ -43,9 +43,8 @@ diff -b test-matliteral.out tests/test-matliteral.out > test-matliteral.diff
 
 ###### Testing test-matliteral2
 ./neo.native -c tests/test-matliteral2.neo > test-matliteral2.ll
-lli test-matliteral2.ll > test-matliteral2.out
-diff -b test-matliteral2.out tests/test-matliteral2.out > test-matliteral2.diff
-###### SUCCESS
+Fatal error: exception Parsing.Parse_error
+###### FAILED
 
 ###### Testing test-matrix_access
 ./neo.native -c tests/test-matrix_access.neo > test-matrix_access.ll
@@ -75,6 +74,12 @@ diff -b test-print_chvelement1.out tests/test-print_chvelement1.out > test-print
 ./neo.native -c tests/test-print_false.neo > test-print_false.ll
 lli test-print_false.ll > test-print_false.out
 diff -b test-print_false.out tests/test-print_false.out > test-print_false.diff
+###### SUCCESS
+
+###### Testing test-print_float
+./neo.native -c tests/test-print_float.neo > test-print_float.ll
+lli test-print_float.ll > test-print_float.out
+diff -b test-print_float.out tests/test-print_float.out > test-print_float.diff
 ###### SUCCESS
 
 ###### Testing test-print_int
@@ -123,6 +128,12 @@ diff -b test-print_while.out tests/test-print_while.out > test-print_while.diff
 ./neo.native -c tests/test-row_column.neo > test-row_column.ll
 lli test-row_column.ll > test-row_column.out
 diff -b test-row_column.out tests/test-row_column.out > test-row_column.diff
+###### SUCCESS
+
+###### Testing test-semant
+./neo.native -c tests/test-semant.neo > test-semant.ll
+lli test-semant.ll > test-semant.out
+diff -b test-semant.out tests/test-semant.out > test-semant.diff
 ###### SUCCESS
 
 ###### Testing test-vector

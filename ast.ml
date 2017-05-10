@@ -95,6 +95,8 @@ let rec string_of_expr = function
   | Vector_access(v, i) ->
       v ^ "[" ^ 
       (List.fold_left (fun str n -> str ^", "^string_of_expr n) "" i) ^"]"
+  | Dimlist(v) -> 
+      v ^ ".dims"
   | Noexpr -> ""
   (*ADD PATTERN FOR VECTOR_LIT AND VECTOR_ACCESS*)
 
