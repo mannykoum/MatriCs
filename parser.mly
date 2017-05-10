@@ -5,7 +5,7 @@ open Ast
 %}
 
 %token SEMI COLON LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA DOT ROWS COLS
-%token PLUS MINUS TIMES DIVIDE ASSIGN NOT DIMS
+%token PLUS MINUS TIMES DIVIDE MOD ASSIGN NOT DIMS AMPERSAND
 %token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
 %token RETURN IF ELSE FOR WHILE INT BOOL FLOAT STRTYPE VOID VECTOR MATRIX
 %token <string> STRING
@@ -16,13 +16,14 @@ open Ast
 
 %nonassoc NOELSE
 %nonassoc ELSE
+%right AMPERSAND
 %right ASSIGN
 %left OR
 %left AND
 %left EQ NEQ
 %left LT GT LEQ GEQ
 %left PLUS MINUS
-%left TIMES DIVIDE
+%left TIMES DIVIDE MOD
 %right NOT NEG
 
 %start program
@@ -60,7 +61,7 @@ typ:
   | BOOL 	     { Bool }
   | STRTYPE 	 { MyString }
   | VOID 	     { Void }
-  | typ LBRACKET dim_list RBRACKET {Vector($1, $3) }
+  | typ LBRACKET dim_list RBRACKET { Vector($1, $3) }
 
 dim_list:
   /* nothing */ {[]}
@@ -102,6 +103,7 @@ expr:
   | expr MINUS  expr { Binop($1, Sub,   $3) }
   | expr TIMES  expr { Binop($1, Mult,  $3) }
   | expr DIVIDE expr { Binop($1, Div,   $3) }
+  | expr MOD    expr { Binop($1, Mod,   $3) }
   | expr EQ     expr { Binop($1, Equal, $3) }
   | expr NEQ    expr { Binop($1, Neq,   $3) }
   | expr LT     expr { Binop($1, Less,  $3) }
@@ -113,7 +115,6 @@ expr:
   | MINUS expr %prec NEG { Unop(Neg, $2) }
   | NOT expr             { Unop(Not, $2) }
   | expr ASSIGN expr     { Assign($1, $3) }
-  /* | vinit ASSIGN expr    { Assign($1, $3) } */  
 
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN           { $2 }
@@ -131,21 +132,17 @@ literal:
   | ID               { Id($1) }
   | STRING           { MyStringLit($1) } 
 
-/* 
-vinit: 
-  typ ID        { Vdecl($1, $2) }  */
-
 vector:
    LBRACKET RBRACKET                  {[]}
 |  LBRACKET vect_list RBRACKET        {List.rev $2}
 
 vect_list:
-  vect_element                        {[$1]} 
-| vect_list COMMA vect_element         { $3 :: $1 }
+  vect_element                        { [$1] } 
+| vect_list COMMA vect_element        { $3 :: $1 }
 
 vect_element:
-  vector                              {Vector_lit($1)}
-| literal                             {$1}
+  vector                              { Vector_lit($1) }
+| literal                             { $1 }
 
 explst:
     expr                { [$1] }

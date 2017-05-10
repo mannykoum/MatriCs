@@ -13,6 +13,7 @@ type sexpr =
 	| SAssign of sexpr * sexpr * typ
 	| SCall of string * sexpr list * typ
 	| SVector_access of string * sexpr list * typ
+	| SReference of string * typ 
 	| SDimlist of string * int list
 	| SNoexpr
 

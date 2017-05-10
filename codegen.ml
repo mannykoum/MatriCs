@@ -25,7 +25,7 @@ let translate (globals, functions) =
   and f64_t  = L.double_type context (* prob with floats *)
   (* and i8_t   = L.i8_type   context *) 
   and i1_t   = L.i1_type   context
-  and ptr_t  = L.pointer_type (L.i8_type (context)) 
+  and str_t  = L.pointer_type (L.i8_type (context)) 
   and array_t = L.array_type 
   and void_t = L.void_type context in
 
@@ -33,7 +33,7 @@ let translate (globals, functions) =
       A.Int -> i32_t
     | A.Float -> f64_t 
     | A.Bool -> i1_t
-    | A.MyString -> ptr_t
+    | A.MyString -> str_t
     | A.Void -> void_t 
     | A.Vector(typ, szl) -> match szl with 
       [] -> ltype_of_typ typ
@@ -56,7 +56,7 @@ let translate (globals, functions) =
     List.fold_left global_var StringMap.empty globals in
 
   (* Declare printf(), which the print built-in function will call *)
-  let printf_t = L.var_arg_function_type i32_t [| ptr_t |] in
+  let printf_t = L.var_arg_function_type i32_t [| str_t |] in
   let printf_func = L.declare_function "printf" printf_t the_module in
 
   (* Define each function (arguments and return type) so we can call it *)
@@ -64,7 +64,7 @@ let translate (globals, functions) =
     let function_decl m fdecl =
       let name = fdecl.S.sfname
       and formal_types =
-	Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.S.sformals)
+	   Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.S.sformals)
       in let ftype = L.function_type (ltype_of_typ fdecl.S.styp) formal_types in
       StringMap.add name (L.define_function name ftype the_module, fdecl) m in
     List.fold_left function_decl StringMap.empty functions in
@@ -106,8 +106,17 @@ let translate (globals, functions) =
           L.build_gep (lookup vname) (Array.append [|L.const_int i32_t 0|] (Array.of_list (List.map (fun e -> expr builder e) indices))) vname builder
         else 
           L.build_load (L.build_gep (lookup vname) (Array.append [|L.const_int i32_t 0|] (Array.of_list (List.map (fun e -> expr builder e) indices))) vname builder) vname builder
-
       in 
+      let build_vect_ref vname i = 
+        let rec make_empty_lst i1 l = 
+          if i1 > 0 then
+            make_empty_lst (i1-1) (0::l)
+          else 
+            l 
+        in 
+        let eml = make_empty_lst i [] in
+        (L.build_in_bounds_gep (lookup vname) ( Array.append [|L.const_int i32_t 0|] (Array.of_list (List.map (fun e -> expr builder (S.SLit(e))) eml))) vname builder)
+      in  
     (match ex with 
 	   S.SLit i -> L.const_int i32_t i
       | S.SFlit f -> L.const_float f64_t f
@@ -138,6 +147,8 @@ let translate (globals, functions) =
     	  let b = (match op with
     	    A.Add when t = A.Int 		-> L.build_add
 				| A.Add when t = A.Float 	-> L.build_fadd 
+        | A.Mod when t = A.Int    -> L.build_srem 
+        | A.Mod when t = A.Float  -> L.build_frem         
 				| A.Sub when t = A.Int 		-> L.build_sub 
 				| A.Sub when t = A.Float 	-> L.build_fsub 
 				| A.Mult when t = A.Int 	-> L.build_mul 
@@ -171,11 +182,9 @@ let translate (globals, functions) =
       | S.SAssign (s, e, _) -> let e' = expr builder e in
         (match s with
           SId(var, _) -> ignore (L.build_store e' (lookup var) builder); e'
-        | SVector_access(vname, idx, ty) -> let gep = build_vect vname idx 1 in 
+      | SVector_access(vname, idx, ty) -> let gep = build_vect vname idx 1 in 
             ignore (L.build_store e' gep builder); e'
-          (* let ex1 = L.build_gep (lookup vname) [|(L.const_int i32_t 0);(expr builder index)|] vname builder
-          in ignore (L.build_store e' ex1 builder); e' *)
-  	    | _ -> raise(Failure("should not reach here")))(*should not reach here ignore (L.build_store e' (lookup s) builder); e' *)
+  	    | _ -> raise(Failure("should not reach here")))
       | S.SCall ("print_int", [e], _) | S.SCall ("printb", [e], _) ->
   	     L.build_call printf_func [| int_format_str ; (expr builder e) |]
   	       "printf" builder
@@ -184,10 +193,6 @@ let translate (globals, functions) =
             "printf" builder
       | S.SCall ("print", [e], _) ->
           L.build_call printf_func [| (expr builder e) |] "printf" builder
-      (*
-      | S.SCall("dimlist", [v], _) -> let v = Vector(ty, dls)
-          in dls; 
-      *)
       | S.SCall (f, act, _) ->
         let (fdef, fdecl) = StringMap.find f function_decls in
   	    let actuals = List.rev (List.map (expr builder) (List.rev act)) in
@@ -196,11 +201,8 @@ let translate (globals, functions) =
            L.build_call fdef (Array.of_list actuals) result builder
       | S.SVector_access (vname, idx, typ) -> 
             build_vect vname idx 0
-
+    
       | S.SDimlist (v, dl) -> L.const_array i32_t (Array.of_list (List.map (fun i -> L.const_int i32_t i) dl)))
-      (* Make separate function, first index needs to be 0 *)
-      (*  L.build_load (L.build_gep (lookup vname) [| (L.const_int i32_t 0); (expr builder idx) |] vname builder) vname builder *)
-
       in
 
     (* Invoke "f builder" if the current block doesn't already

@@ -131,7 +131,7 @@ let check (globals, functions) =
 
     let match_binop t1 t2 op e =
       (match op with
-      Add | Sub | Mult | Div -> 
+      Add | Sub | Mult | Mod | Div -> 
 				(match t1 with
       		Int -> 
 						(match t2 with 
@@ -174,7 +174,7 @@ let check (globals, functions) =
         *)
         | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
 		      (match op with
-		      Add | Sub | Mult | Div -> 
+		      Add | Sub | Mod | Mult | Div -> 
 						(match t1 with
 		      		Int -> 
 								(match t2 with 
@@ -230,15 +230,15 @@ let check (globals, functions) =
                fd.formals actuals;
              fd.typ
         | Vector_access(nm, ilst) -> let Vector(typ, sz) = type_of_identifier nm in
-          let rec check_i = function
-            [idx] -> let idxtyp = expr idx in
-                  if idxtyp != Int then raise (Failure ("array " ^ nm 
-                    ^ " index not an integer"))
-                  else typ
-            | hd::tl -> let idxtyp = expr hd in
-            if idxtyp != Int then raise (Failure ("array " ^ nm 
-                 ^ " index not an integer"))
-            else check_i tl in check_i ilst
+            (let rec check_i = function
+              [idx] -> let idxtyp = expr idx in
+                    if idxtyp != Int then raise (Failure ("array " ^ nm 
+                      ^ " index not an integer"))
+                    else typ
+              | hd::tl -> let idxtyp = expr hd in
+              if idxtyp != Int then raise (Failure ("array " ^ nm 
+                   ^ " index not an integer"))
+            else check_i tl in check_i ilst)
         | Dimlist s -> let nm = type_of_identifier s in
             (match nm with
               Vector(typ, szl) -> Vector(Int, [(List.length szl)])
@@ -330,7 +330,7 @@ let check (globals, functions) =
 	      let typ1 = sast_to_typ t1 and typ2 = sast_to_typ t2 in
 				let typ_of_bop = 
 					(match op with
-		      Add | Sub | Mult | Div -> 
+		      Add | Sub | Mult | Mod | Div -> 
 						(match typ1 with
 		      		Int -> 
 								(match typ2 with 

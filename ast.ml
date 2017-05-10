@@ -1,14 +1,13 @@
 (* Abstract Syntax Tree and functions for printing it *)
 
-type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
+type op = Add | Sub | Mult | Div | Mod | Equal | Neq | Less | Leq | Greater | Geq |
           And | Or
 
 type uop = Neg | Not
 
-(* HERE ADD NUM TYPE FOR FLOATS AND INTS*)
-
 type typ = Int | Float | Bool | MyString | Void 
 	  | Vector of typ * int list
+    | Pointer of typ * int
 
 type bind = typ * string
 
@@ -25,9 +24,8 @@ type expr =
   | Assign of expr * expr
   | Call of string * expr list
   | Vector_access of string * expr list
+  | Reference of string 
   | Dimlist of string 
-  | Rows of string
-  | Cols of string
   | Noexpr
 
 type stmt =
@@ -58,12 +56,20 @@ let rec string_of_typ = function
   | Void -> "void"
   | Vector(t, l) -> (string_of_typ t)^"["^
     (List.fold_left (fun str n -> str ^", "^string_of_int n) "" l)^"]"
+  | Pointer(t, i) -> 
+    let rec build_ptr_str str i =
+      if i > 0 then
+        build_ptr_str (str^"*") (i-1)
+      else
+        str
+    in build_ptr_str (string_of_typ t) i
 
 let string_of_op = function
     Add -> "+"
   | Sub -> "-"
   | Mult -> "*"
   | Div -> "/"
+  | Mod -> "%"
   | Equal -> "=="
   | Neq -> "!="
   | Less -> "<"
@@ -97,6 +103,8 @@ let rec string_of_expr = function
       (List.fold_left (fun str n -> str ^", "^string_of_expr n) "" i) ^"]"
   | Dimlist(v) -> 
       v ^ ".dims"
+  | Reference(s) ->
+      "&" ^ s
   | Noexpr -> ""
   (*ADD PATTERN FOR VECTOR_LIT AND VECTOR_ACCESS*)
 
