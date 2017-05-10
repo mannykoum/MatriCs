@@ -25,6 +25,7 @@ type expr =
   | Assign of expr * expr
   | Call of string * expr list
   | Vector_access of string * expr list
+  | Dimlist of string 
   | Rows of string
   | Cols of string
   | Noexpr

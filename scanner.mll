@@ -15,6 +15,7 @@ rule token = parse
 | '['      { LBRACKET }
 | ']'      { RBRACKET }
 | ';'      { SEMI }
+| '.'      { DOT }
 | ','      { COMMA }
 | '+'      { PLUS }
 | '-'      { MINUS }
@@ -42,6 +43,7 @@ rule token = parse
 | "string" { STRTYPE }
 | "void"   { VOID }
 
+| "dims"   { DIMS }
 (*| "vector" { VECTOR } *)
 
 | "true"   { TRUE }

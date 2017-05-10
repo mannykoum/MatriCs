@@ -121,13 +121,7 @@ expr:
   | ID LBRACKET explst RBRACKET    { Vector_access($1, List.rev $3) }
   | vector                         { Vector_lit($1) }
 
-/*| ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET  { Vector_access (Vector_access($1, $3), $6) } */
-/*| LBRACKET matrix_opt RBRACKET       { Matrix_lit($2) } */
-/*| ID LBRACKET expr COMMA expr RBRACKET       { Matrix_access($1, $3, $5) } */
-/*| ID LBRACKET expr COMMA COLON RBRACKET      { Matrix_row($1, $3) } */
-/*| ID LBRACKET COLON COMMA expr RBRACKET      { Matrix_col($1, $5) } */
-/*| ID COLON ROWS                              { Rows($1) } */
-/*| ID COLON COLS                              { Cols($1) } */
+  | ID DOT DIMS                    { Dimlist($1) }
   
 literal:
     LITERAL          { Literal($1) }

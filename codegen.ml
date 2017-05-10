@@ -184,6 +184,10 @@ let translate (globals, functions) =
             "printf" builder
       | S.SCall ("print", [e], _) ->
           L.build_call printf_func [| (expr builder e) |] "printf" builder
+      (*
+      | S.SCall("dimlist", [v], _) -> let v = Vector(ty, dls)
+          in dls; 
+      *)
       | S.SCall (f, act, _) ->
         let (fdef, fdecl) = StringMap.find f function_decls in
   	    let actuals = List.rev (List.map (expr builder) (List.rev act)) in
@@ -192,6 +196,10 @@ let translate (globals, functions) =
            L.build_call fdef (Array.of_list actuals) result builder
       | S.SVector_access (vname, idx, typ) -> 
             build_vect vname idx 0)
+(*
+      | S.SDims(v) -> (match v with 
+          Vector(t,dl) -> L.const_array i32_t (Array.of_list (List.map (expr builder) dl))
+          | _ -> raise (Failure ("dims cannot be called on non-Vector types"))) *)
       (* Make separate function, first index needs to be 0 *)
       (*  L.build_load (L.build_gep (lookup vname) [| (L.const_int i32_t 0); (expr builder idx) |] vname builder) vname builder *)
 

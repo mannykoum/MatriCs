@@ -69,10 +69,14 @@ let check (globals, functions) =
 
       { typ = Void; fname = "printb"; formals = [(Bool, "x")];
       locals = []; body = [] };
+(*
+      { typ = Void; fname = "dimlist"; formals = [(Vector(), "v")];
+      locals = []; body = [] };
+*)
       ]
    in 
 
-   let built_in_decls_names = [ "print_int"; "print_float"; "printb" ]
+   let built_in_decls_names = [ "print_int"; "print_float"; "printb"(*; "dimlist"*)]
 
  in
 
