@@ -235,6 +235,10 @@ let check (globals, functions) =
             if idxtyp != Int then raise (Failure ("array " ^ nm 
                  ^ " index not an integer"))
             else check_i tl in check_i ilst
+        | Dimlist s -> let nm = type_of_identifier var in
+            (match nm with
+              Vector(typ, szl) -> Vector(Int, [(List.length szl)])
+            | _ -> raise(Failure("dims cannot be called on non-vector type "^var)))
           (* TODO: TRY IMPLEMENTING INDEX OUT OF BOUNDS 
           else let Vector(typ, sz) = type_of_identifier nm in 
             if (sz - 1) < idx then raise (Failure ("array " ^ nm 
@@ -382,6 +386,7 @@ let check (globals, functions) =
       | Vector_access(vname, idx) -> let Vector(typ, _) = type_of_identifier vname in 
           let sidx = List.map sexpr idx in 
           SVector_access(vname, sidx, typ)
+      | Dimlist s -> SDimlist s
 
     in
 
