@@ -160,8 +160,13 @@ let check (globals, functions) =
         | BoolLit _ -> Bool
         | Id s -> type_of_identifier s
         | MyStringLit _ -> MyString
-        | Vector_lit elements -> Vector(Int, [5])
-        (*
+        | Vector_lit elements -> (* This is weak *) 
+(*           let rec vector_dims i = function
+            | [x] when x = Vector_lit(lst) -> vector_dims i+1 lst
+            | [x] -> i
+            | x::tl when x = Vector_lit(lst) -> vector_dims i+1 lst
+            | x::tl -> i
+          in *)
           let rec check_vector_types i = function
             | [] -> raise( Failure ("empty literal not allowed"))
             | [el] -> Vector(expr el, [i+1]) (* HACKY FIX  *)
@@ -171,7 +176,21 @@ let check (globals, functions) =
               else raise (Failure ("unmatched element types in vector literal " ^
                 string_of_typ (expr fst) ^ ", " ^ string_of_typ (expr snd))) 
           in check_vector_types 0 elements 
-        *)
+(*           let depth = vector_dims 1 elements in 
+          while depth>0 do
+            check_vector_types *)
+          done
+          let rec check_vector_types i = function
+            | [] -> raise( Failure ("empty literal not allowed"))
+            | [el] -> Vector(expr el, [i+1]) (* HACKY FIX  *)
+            | fst :: snd :: tail -> 
+              if (expr fst) == (expr snd) then
+                check_vector_types (i+1) (snd::tail)
+              else raise (Failure ("unmatched element types in vector literal " ^
+                string_of_typ (expr fst) ^ ", " ^ string_of_typ (expr snd))) 
+          in check_vector_types 0 elements 
+
+    
         | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
 		      (match op with
 		      Add | Sub | Mult | Div -> 
