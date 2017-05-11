@@ -1,0 +1,6 @@
+int main(){
+    //void x;
+    int x;
+    print_int(5);
+    return 0;
+}

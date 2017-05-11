@@ -1,0 +1,13 @@
+float potato(){
+	float malaka;
+	malaka = 1.23e-2;
+	return malaka;
+}
+
+int main(){
+	float a;
+	//print("My name is Mano, I love potatos!");
+	a = potato();
+	print_float(a);
+	return 0;
+}

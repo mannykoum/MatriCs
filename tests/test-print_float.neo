@@ -1,0 +1,6 @@
+int main(){
+    float x;
+    x = 1.3;
+    print_float(x);
+    return 0; 
+}
