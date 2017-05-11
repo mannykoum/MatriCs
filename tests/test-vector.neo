@@ -3,7 +3,8 @@
 int main (){ 
 	int[5] x;
 	int a;
-    u = 9;
+   	int u;
+	u = 9;
 	x = [1,2,3,4,5];
 	a = x[2] + 3;
 

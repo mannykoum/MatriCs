@@ -13,9 +13,9 @@ int main() {
 		}
 	} 
 	*/
-
-	for(i = 0; i < a.dims.dims[0]; i= i+1) {
-		print_int(a.dims[i]);
+	b = a.dims;
+	for(i = 0; i < 2; i= i+1) {
+		print_int(b[i]);
 	}
 	return 0;
 }

@@ -11,6 +11,12 @@ lli test-comments.ll > test-comments.out
 diff -b test-comments.out tests/test-comments.out > test-comments.diff
 ###### SUCCESS
 
+###### Testing test-demo
+./neo.native -c tests/test-demo.neo > test-demo.ll
+lli test-demo.ll > test-demo.out
+diff -b test-demo.out tests/test-demo.out > test-demo.diff
+###### SUCCESS
+
 ###### Testing test-empty
 ./neo.native -c tests/test-empty.neo > test-empty.ll
 lli test-empty.ll > test-empty.out
@@ -35,6 +41,17 @@ lli test-hello_world.ll > test-hello_world.out
 diff -b test-hello_world.out tests/test-hello_world.out > test-hello_world.diff
 ###### SUCCESS
 
+###### Testing test-id
+./neo.native -c tests/test-id.neo > test-id.ll
+lli test-id.ll > test-id.out
+diff -b test-id.out tests/test-id.out > test-id.diff
+###### SUCCESS
+
+###### Testing test-inverse
+./neo.native -c tests/test-inverse.neo > test-inverse.ll
+Fatal error: exception Failure("unrecognized function print2d_f")
+###### FAILED
+
 ###### Testing test-matliteral
 ./neo.native -c tests/test-matliteral.neo > test-matliteral.ll
 lli test-matliteral.ll > test-matliteral.out
@@ -43,13 +60,32 @@ diff -b test-matliteral.out tests/test-matliteral.out > test-matliteral.diff
 
 ###### Testing test-matliteral2
 ./neo.native -c tests/test-matliteral2.neo > test-matliteral2.ll
-Fatal error: exception Parsing.Parse_error
-###### FAILED
+lli test-matliteral2.ll > test-matliteral2.out
+diff -b test-matliteral2.out tests/test-matliteral2.out > test-matliteral2.diff
+###### SUCCESS
 
 ###### Testing test-matrix_access
 ./neo.native -c tests/test-matrix_access.neo > test-matrix_access.ll
 lli test-matrix_access.ll > test-matrix_access.out
 diff -b test-matrix_access.out tests/test-matrix_access.out > test-matrix_access.diff
+###### SUCCESS
+
+###### Testing test-matrixprint2d
+./neo.native -c tests/test-matrixprint2d.neo > test-matrixprint2d.ll
+lli test-matrixprint2d.ll > test-matrixprint2d.out
+diff -b test-matrixprint2d.out tests/test-matrixprint2d.out > test-matrixprint2d.diff
+###### SUCCESS
+
+###### Testing test-matrixprint3d
+./neo.native -c tests/test-matrixprint3d.neo > test-matrixprint3d.ll
+lli test-matrixprint3d.ll > test-matrixprint3d.out
+diff -b test-matrixprint3d.out tests/test-matrixprint3d.out > test-matrixprint3d.diff
+###### SUCCESS
+
+###### Testing test-mod
+./neo.native -c tests/test-mod.neo > test-mod.ll
+lli test-mod.ll > test-mod.out
+diff -b test-mod.out tests/test-mod.out > test-mod.diff
 ###### SUCCESS
 
 ###### Testing test-print_boolean
@@ -98,6 +134,12 @@ diff -b test-print_string.out tests/test-print_string.out > test-print_string.di
 ./neo.native -c tests/test-print_true.neo > test-print_true.ll
 lli test-print_true.ll > test-print_true.out
 diff -b test-print_true.out tests/test-print_true.out > test-print_true.diff
+###### SUCCESS
+
+###### Testing test-print_vector
+./neo.native -c tests/test-print_vector.neo > test-print_vector.ll
+lli test-print_vector.ll > test-print_vector.out
+diff -b test-print_vector.out tests/test-print_vector.out > test-print_vector.diff
 ###### SUCCESS
 
 ###### Testing test-print_velement
