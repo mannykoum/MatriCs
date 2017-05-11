@@ -5,9 +5,11 @@ type op = Add | Sub | Mult | Div | Mod | Equal | Neq | Less | Leq | Greater | Ge
 
 type uop = Neg | Not
 
+type uopment = Increment | Decrement 
+
+(* HERE ADD NUM TYPE FOR FLOATS AND INTS*)
 type typ = Int | Float | Bool | MyString | Void 
 	  | Vector of typ * int list
-    | Pointer of typ * int
 
 type bind = typ * string
 
@@ -21,6 +23,7 @@ type expr =
   | Vdecl of bind 
   | Binop of expr * op * expr
   | Unop of uop * expr
+  | Incrementer of expr * uopment
   | Assign of expr * expr
   | Call of string * expr list
   | Vector_access of string * expr list
@@ -56,13 +59,6 @@ let rec string_of_typ = function
   | Void -> "void"
   | Vector(t, l) -> (string_of_typ t)^"["^
     (List.fold_left (fun str n -> str ^", "^string_of_int n) "" l)^"]"
-  | Pointer(t, i) -> 
-    let rec build_ptr_str str i =
-      if i > 0 then
-        build_ptr_str (str^"*") (i-1)
-      else
-        str
-    in build_ptr_str (string_of_typ t) i
 
 let string_of_op = function
     Add -> "+"
@@ -83,6 +79,10 @@ let string_of_uop = function
     Neg -> "-"
   | Not -> "!"
 
+let string_of_uopment = function
+    Increment -> "++"
+  | Decrement -> "--"
+
 let rec string_of_expr = function
     Literal(l) -> string_of_int l
   | Fliteral(f) -> string_of_float f
@@ -95,6 +95,7 @@ let rec string_of_expr = function
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Unop(o, e) -> string_of_uop o ^ string_of_expr e
+  | Incrementer(e, uop) -> string_of_expr e ^" "^ string_of_uopment uop
   | Assign(v, e) -> string_of_expr v ^ " = " ^ string_of_expr e 
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
@@ -103,8 +104,6 @@ let rec string_of_expr = function
       (List.fold_left (fun str n -> str ^", "^string_of_expr n) "" i) ^"]"
   | Dimlist(v) -> 
       v ^ ".dims"
-  | Reference(s) ->
-      "&" ^ s
   | Noexpr -> ""
   (*ADD PATTERN FOR VECTOR_LIT AND VECTOR_ACCESS*)
 

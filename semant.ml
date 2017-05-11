@@ -202,6 +202,10 @@ let check (globals, functions) =
                     | _ -> raise (Failure ("illegal unary operator " ^ string_of_uop op ^
           	  		    string_of_typ t ^ " in " ^ string_of_expr ex))
           )
+        | Incrementer(e, uop) as ex -> let t = expr e in 
+          (match t with
+            Int -> Int 
+            | _ -> raise (Failure("illegal type cannot be incremented " ^ string_of_typ t)))
         | Noexpr -> Void
         | Assign(var_ex, e) as ex -> 
           (match var_ex with
@@ -353,6 +357,18 @@ let check (globals, functions) =
         SBinop(t1, op, t2, typ1, typ2, typ_of_bop)
       | Unop(op, e) -> let t = sexpr e in
         SUnop(op, t, sast_to_typ(t))
+      | Incrementer(e, uop) -> 
+         (match uop with
+            Increment -> sexpr (Assign(e, Binop(e, Add, Literal(1))))
+            | Decrement -> sexpr (Assign(e, Binop(e, Sub, Literal(1)))) )(* let t = sexpr e in 
+        let type_of_e = sast_to_typ t in
+        let type_of_exp = (
+          match type_of_e with 
+            Int -> Int
+          | _ -> raise (Failure ("Illegal type " ^ string_of_typ type_of_e ^ " " ^ "cannot be incremented"))
+        ) in
+        SIncremeneter(e, uop, type_of_exp)
+ *)
       | Noexpr -> SNoexpr 
 
       | Assign(var_ex, e) as ex-> 

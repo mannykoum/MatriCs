@@ -1,0 +1,33 @@
+int main() {
+int i;
+int j;
+// int c;
+// int x;
+// int y;
+
+int [2, 2] mat;
+// c = 0;
+for(i = 0; i < 2; i = i + 1) {
+	for (j = 0; j < 2; j = j + 1) {
+		if(i == j) {
+			// print_int(1);
+			// mat[i,j] = 1;
+			// print(mat[i,j]);
+			// x = 1;
+			mat[i, j] = 1;
+			print_int(mat[i,j]);		
+			// c = c+1;
+		}
+		else {
+			// print_int(0);
+			// mat[i, j] = 0;
+			// print(mat[i, j]);
+			// y = 0;
+			mat[i, j] = 0;
+			print_int(mat[i,j]);
+			// c = c + 1;
+		}
+	} 
+}
+return 0;
+}

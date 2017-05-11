@@ -40,14 +40,7 @@ let translate (globals, functions) =
       | [x] ->  array_t (ltype_of_typ (A.Vector(typ, []))) x
       | hd::tl -> array_t (ltype_of_typ (A.Vector(typ, tl))) hd 
     in
-(*     (match typ with 
-        A.Int     -> array_t i32_t size
-      | A.Float   -> array_t f64_t size
-      | A.Bool  -> array_t i1_t size
-      | A.MyString -> array_t ptr_t size
-      | A.Vector(typ2, szl) -> match szl with
-      | _ -> raise (Failure("Array Type Not Valid")))
-*)
+    
   (* Declare each global variable; remember its value in a map *)
   let global_vars =
     let global_var m (t, n) =
@@ -74,8 +67,8 @@ let translate (globals, functions) =
     let (the_function, _) = StringMap.find fdecl.S.sfname function_decls in
     let builder = L.builder_at_end context (L.entry_block the_function) in
 
-    let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
-    let float_format_str = L.build_global_stringptr "%f\n" "fmt" builder in
+    let int_format_str = L.build_global_stringptr "%d" "fmt" builder in
+    let float_format_str = L.build_global_stringptr "%f" "fmt" builder in
     
     (* Construct the function's "locals": formal arguments and locally
        declared variables.  Allocate each on the stack, initialize their
@@ -174,7 +167,7 @@ let translate (globals, functions) =
 						| _ -> e2'))
 					| _ -> (e1', e2')
 				in b e1'' e2'' "tmp" builder
-      | S.SUnop(op, e, _) ->
+      | S.SUnop(op, e, t) ->
     	  let e' = expr builder e in
     	  (match op with
     	    A.Neg     -> L.build_neg

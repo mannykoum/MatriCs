@@ -5,7 +5,9 @@ open Ast
 %}
 
 %token SEMI COLON LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA DOT ROWS COLS
-%token PLUS MINUS TIMES DIVIDE MOD ASSIGN NOT DIMS AMPERSAND
+%token PLUS MINUS TIMES DIVIDE MOD ASSIGN NOT DIMS 
+%token PLUSPLUS MINMIN
+%token PLUS MINUS TIMES DIVIDE ASSIGN NOT DIMS
 %token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
 %token RETURN IF ELSE FOR WHILE INT BOOL FLOAT STRTYPE VOID VECTOR MATRIX
 %token <string> STRING
@@ -16,7 +18,7 @@ open Ast
 
 %nonassoc NOELSE
 %nonassoc ELSE
-%right AMPERSAND
+%nonassoc PLUSPLUS MINMIN
 %right ASSIGN
 %left OR
 %left AND
@@ -114,6 +116,8 @@ expr:
   | expr OR     expr { Binop($1, Or,    $3) }
   | MINUS expr %prec NEG { Unop(Neg, $2) }
   | NOT expr             { Unop(Not, $2) }
+  | expr PLUSPLUS        { Incrementer($1, Increment)}
+  | expr MINMIN          { Incrementer($1, Decrement)}
   | expr ASSIGN expr     { Assign($1, $3) }
 
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
