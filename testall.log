@@ -188,3 +188,19 @@ diff -b test-vector.out tests/test-vector.out > test-vector.diff
 ./neo.native -c tests/fail-assign1.neo 2> fail-assign1.err >> testall.log
 diff -b fail-assign1.err tests/fail-assign1.err > fail-assign1.diff
 ###### SUCCESS
+
+###### Testing fail-vect_lit
+./neo.native -c tests/fail-vect_lit.neo 2> fail-vect_lit.err >> testall.log
+diff -b fail-vect_lit.err tests/fail-vect_lit.err > fail-vect_lit.diff
+###### SUCCESS
+
+###### Testing fail-vect_lit2
+./neo.native -c tests/fail-vect_lit2.neo 2> fail-vect_lit2.err >> testall.log
+diff -b fail-vect_lit2.err tests/fail-vect_lit2.err > fail-vect_lit2.diff
+###### SUCCESS
+
+###### Testing fail-vect_lit3
+./neo.native -c tests/fail-vect_lit3.neo 2> fail-vect_lit3.err >> testall.log
+diff -b fail-vect_lit3.err tests/fail-vect_lit3.err > fail-vect_lit3.diff
+FAILED fail-vect_lit3.err differs from tests/fail-vect_lit3.err
+###### FAILED

@@ -163,8 +163,16 @@ let check (globals, functions) =
         | Vector_lit elements -> 
           let hdel = List.hd elements in
           (match hdel with 
-           Vector_lit(els) -> let Vector(typ, szl) = expr hdel 
-            in Vector(typ, ((List.length elements)::szl))
+           Vector_lit(els) -> 
+             let rec check_vect_vects = function 
+              | [] -> raise(Failure("empty literal not allowed"))
+              | [x] -> let Vector(typ, szl) = expr x in Vector(typ, ((List.length elements)::szl))
+              | fst :: snd :: tail -> let Vector(t1, s1) = expr fst and Vector(t2, s2) = expr snd in 
+                  if t1 == t2 then 
+                    let flag = List.iter2 (fun a b -> if a != b then raise (Failure("nested vector literals are of different sizes " )) else () ) s1 s2 
+                    in check_vect_vects (snd::tail)  
+                  else raise (Failure("nested vector literals are of different types "^string_of_typ t1^" and "^string_of_typ t2)) 
+              in  check_vect_vects elements
           | _ -> let rec check_vector_types i = function
                 | [] -> raise( Failure ("empty literal not allowed"))
                 | [el] -> Vector(expr el, [i+1]) (* HACKY FIX  *)
