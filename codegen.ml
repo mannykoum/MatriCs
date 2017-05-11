@@ -22,10 +22,10 @@ let translate (globals, functions) =
   let context = L.global_context () in
   let the_module = L.create_module context "MatriCs"
   and i32_t  = L.i32_type  context
-  and f64_t  = L.double_type context (* prob with floats *)
+  and f64_t  = L.double_type context 
   (* and i8_t   = L.i8_type   context *) 
   and i1_t   = L.i1_type   context
-  and str_t  = L.pointer_type (L.i8_type (context)) 
+  and str_t  = L.pointer_type (L.i8_type (context))
   and array_t = L.array_type 
   and void_t = L.void_type context in
 
@@ -39,8 +39,31 @@ let translate (globals, functions) =
       [] -> ltype_of_typ typ
       | [x] ->  array_t (ltype_of_typ (A.Vector(typ, []))) x
       | hd::tl -> array_t (ltype_of_typ (A.Vector(typ, tl))) hd 
-    in
-    
+  in
+
+  let rec lconst_of_typ = function
+      A.Int -> L.const_int i32_t 0
+    | A.Float -> L.const_float f64_t 0.0
+    | A.Bool -> L.const_int i1_t 0
+    (* | A.MyString -> L.const_string str_t 0 *)
+    (* | A.Void -> () *)
+    | A.Vector(typ, szl) -> 
+      let rec build0array i arr = 
+        if i>0 then
+          build0array (i-1) (Array.append [|lconst_of_typ typ|] arr)
+        else
+          arr
+      in
+      (match szl with
+      | [x] -> L.const_array (ltype_of_typ typ) (build0array (x) [|lconst_of_typ typ|])
+      | hd::tl ->  L.const_array (ltype_of_typ typ) (build0array (hd) [|lconst_of_typ (Vector(typ, tl))|]) )
+(*                                 List. (Array.append [|L.const_of_typ typ|]) (Array.of_list)) *)
+    (* | A.Vector(typ, szl) -> raise(Failure("cannot return vectors of more than 2 dimensions at the moment"))(* match szl with  *)
+      [] -> lconst_of_typ typ
+      | [x] ->  L.const_array (array_t (lconst_of_typ (A.Vector(typ, [])))) x
+      | hd::tl -> L.const_array (array_t (lconst_of_typ (A.Vector(typ, tl)))) hd  *)
+  in
+
   (* Declare each global variable; remember its value in a map *)
   let global_vars =
     let global_var m (t, n) =
@@ -120,20 +143,6 @@ let translate (globals, functions) =
       | S.SVector_lit(el, ty, diml) -> (match diml with 
          [x] -> L.const_array (ltype_of_typ ty) (Array.of_list (List.map (expr builder) el))
         | hd::tl -> L.const_array (ltype_of_typ (A.Vector(ty,tl))) (Array.of_list (List.map (expr builder) el)))
-
-(*        match diml with 
-        [] -> L.const_array (ltype_of_typ ty) 
-        | [x] ->  L.const_array array_t ((A.Vector(ty, []))) x
-        | hd::tl -> *)  
-(*
-        let lst = List.map (expr builder) el in
-        let arr = Array.of_list lst in
-        let makevect vty = function
-        | SVector_lit(el, _, _) -> L.const_array (A.Vector()) arr
-        | 
-        array_t (ltype_of_typ (A.Vector(typ, []))) x
-        in makevect List.hd lst 
-          L.const_array (ltype_of_typ ty) arr *)
       | S.SBinop (e1, op, e2, t1, t2, t) ->
     	  let e1' = expr builder e1
     	  and e2' = expr builder e2 in
@@ -208,41 +217,40 @@ let translate (globals, functions) =
     (* Build the code for the given statement; return the builder for
        the statement's successor *)
     let rec stmt builder = function
-	S.SBlock sl -> List.fold_left stmt builder sl
+	     S.SBlock sl -> List.fold_left stmt builder sl
       | S.SExpr e -> ignore (expr builder e); builder
       | S.SReturn e -> ignore (match fdecl.S.styp with
-	  A.Void -> L.build_ret_void builder
-	| _ -> L.build_ret (expr builder e) builder); builder
+	       A.Void -> L.build_ret_void builder
+	       | _ -> L.build_ret (expr builder e) builder); builder
       | S.SIf (predicate, then_stmt, else_stmt) ->
          let bool_val = expr builder predicate in
-	 let merge_bb = L.append_block context "merge" the_function in
+      	 let merge_bb = L.append_block context "merge" the_function in
 
-	 let then_bb = L.append_block context "then" the_function in
-	 add_terminal (stmt (L.builder_at_end context then_bb) then_stmt)
-	   (L.build_br merge_bb);
+      	 let then_bb = L.append_block context "then" the_function in
+      	 add_terminal (stmt (L.builder_at_end context then_bb) then_stmt)
+      	   (L.build_br merge_bb);
 
-	 let else_bb = L.append_block context "else" the_function in
-	 add_terminal (stmt (L.builder_at_end context else_bb) else_stmt)
-	   (L.build_br merge_bb);
+      	 let else_bb = L.append_block context "else" the_function in
+      	 add_terminal (stmt (L.builder_at_end context else_bb) else_stmt)
+      	   (L.build_br merge_bb);
 
-	 ignore (L.build_cond_br bool_val then_bb else_bb builder);
-	 L.builder_at_end context merge_bb
+      	 ignore (L.build_cond_br bool_val then_bb else_bb builder);
+      	 L.builder_at_end context merge_bb
 
       | S.SWhile (predicate, body) ->
-	  let pred_bb = L.append_block context "while" the_function in
-	  ignore (L.build_br pred_bb builder);
+    	  let pred_bb = L.append_block context "while" the_function in
+    	  ignore (L.build_br pred_bb builder);
 
-	  let body_bb = L.append_block context "while_body" the_function in
-	  add_terminal (stmt (L.builder_at_end context body_bb) body)
-	    (L.build_br pred_bb);
+    	  let body_bb = L.append_block context "while_body" the_function in
+    	  add_terminal (stmt (L.builder_at_end context body_bb) body)
+    	    (L.build_br pred_bb);
 
-	  let pred_builder = L.builder_at_end context pred_bb in
-	  let bool_val = expr pred_builder predicate in
+    	  let pred_builder = L.builder_at_end context pred_bb in
+    	  let bool_val = expr pred_builder predicate in
 
-	  let merge_bb = L.append_block context "merge" the_function in
-	  ignore (L.build_cond_br bool_val body_bb merge_bb pred_builder);
-	  L.builder_at_end context merge_bb
-
+    	  let merge_bb = L.append_block context "merge" the_function in
+    	  ignore (L.build_cond_br bool_val body_bb merge_bb pred_builder);
+    	  L.builder_at_end context merge_bb
       | S.SFor (e1, e2, e3, body) -> stmt builder
 	    ( S.SBlock [S.SExpr e1 ; S.SWhile (e2, S.SBlock [body ; S.SExpr e3]) ] )
     in
@@ -253,7 +261,7 @@ let translate (globals, functions) =
     (* Add a return if the last block falls off the end *)
     add_terminal builder (match fdecl.S.styp with
         A.Void -> L.build_ret_void
-      | t -> L.build_ret (L.const_int (ltype_of_typ t) 0))
+      | t -> L.build_ret (lconst_of_typ t))  (* (L.const_int (ltype_of_typ t) 0)) *)
   in
 
   List.iter build_function_body functions;

@@ -166,6 +166,24 @@ lli test-print_while.ll > test-print_while.out
 diff -b test-print_while.out tests/test-print_while.out > test-print_while.diff
 ###### SUCCESS
 
+###### Testing test-return_float
+./neo.native -c tests/test-return_float.neo > test-return_float.ll
+lli test-return_float.ll > test-return_float.out
+diff -b test-return_float.out tests/test-return_float.out > test-return_float.diff
+###### SUCCESS
+
+###### Testing test-return_vect
+./neo.native -c tests/test-return_vect.neo > test-return_vect.ll
+lli test-return_vect.ll > test-return_vect.out
+diff -b test-return_vect.out tests/test-return_vect.out > test-return_vect.diff
+###### SUCCESS
+
+###### Testing test-return_vect2d
+./neo.native -c tests/test-return_vect2d.neo > test-return_vect2d.ll
+Assertion failed: (V[i]->getType() == Ty->getElementType() && "Wrong type in array element initializer"), function getImpl, file /private/tmp/llvm@3.7-20170130-86139-15td9ho/llvm-3.7.1.src/lib/IR/Constants.cpp, line 885.
+./testall.sh: line 57: 87606 Abort trap: 6           ./neo.native -c tests/test-return_vect2d.neo > test-return_vect2d.ll
+###### FAILED
+
 ###### Testing test-row_column
 ./neo.native -c tests/test-row_column.neo > test-row_column.ll
 lli test-row_column.ll > test-row_column.out
@@ -202,5 +220,4 @@ diff -b fail-vect_lit2.err tests/fail-vect_lit2.err > fail-vect_lit2.diff
 ###### Testing fail-vect_lit3
 ./neo.native -c tests/fail-vect_lit3.neo 2> fail-vect_lit3.err >> testall.log
 diff -b fail-vect_lit3.err tests/fail-vect_lit3.err > fail-vect_lit3.diff
-FAILED fail-vect_lit3.err differs from tests/fail-vect_lit3.err
-###### FAILED
+###### SUCCESS

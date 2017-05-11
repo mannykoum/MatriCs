@@ -1,14 +1,14 @@
-int[1,2] yooolo()
+int[1,1,3] yooolo()
 {
-	int[1,2] a;
-	a = [[1,2]];
+	int[1,1,3] a;
+	a = [[[1,2,3]]];
 	return a;
 }
 
 int main()
 {
-	int[1,2] b;
+	int[1,1,3] b;
 	b = yooolo();
-	print_int(b[0,1]);
+	print_int(b[0,0,1]);
 	return 0;
 }
